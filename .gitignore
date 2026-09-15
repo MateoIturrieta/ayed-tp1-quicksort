@@ -1,3 +1,13 @@
 __pycache__/
 *.pyc
 *.bak
+
+# quedan en la carpeta local, pero fuera del repo
+graficos.py
+resultados_quicksort.csv
+grafico_resultados.png
+visualizador.html
+informe.html
+empaquetar.py
+busqueda_binaria.py
+resultados_busqueda.csv
