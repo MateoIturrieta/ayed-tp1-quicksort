@@ -1,69 +1,48 @@
-# Quicksort con pivote en el ultimo elemento - Grupo 38
+def mostrar(vector, inicio, fin, mensaje):
+    # Función para visualizar el estado del vector en cada paso
+    texto = ""
+    for i in range(len(vector)):
+        if i == inicio or i == fin:
+            texto = texto + "[" + str(vector[i]) + "] "
+        else:
+            texto = texto + str(vector[i]) + " "
+    print(mensaje + ": " + texto)
 
-import random
-import time
+def particionar(vector, bajo, alto):
+    pivote = vector[alto]  # elegimos el último elemento como pivote
+    print("Pivote elegido: " + str(pivote))
+    i = bajo - 1  # índice del menor elemento
+    for j in range(bajo, alto):
+        if vector[j] <= pivote:
+            i = i + 1
+            # Intercambio manual (swap) sin usar funciones externas
+            temp = vector[i]
+            vector[i] = vector[j]
+            vector[j] = temp
+            mostrar(vector, bajo, alto, "  Intercambio")
+    # Colocamos el pivote en su posición final
+    temp = vector[i + 1]
+    vector[i + 1] = vector[alto]
+    vector[alto] = temp
+    mostrar(vector, bajo, alto, "  Pivote ubicado")
+    return i + 1
 
-random.seed(38)
+def quicksort(vector, bajo, alto):
+    if bajo < alto:
+        print("Ordenando desde indice " + str(bajo) + " hasta " + str(alto))
+        posicion_pivote = particionar(vector, bajo, alto)
+        # Ordenamos recursivamente las dos mitades
+        quicksort(vector, bajo, posicion_pivote - 1)
+        quicksort(vector, posicion_pivote + 1, alto)
 
-tamanios = [500, 1000, 2000, 4000, 8000]
+# ---------- PROGRAMA PRINCIPAL ----------
+n = int(input("Ingrese la cantidad de elementos: "))
+vector = [0] * n
+for i in range(n):
+    vector[i] = int(input("Elemento " + str(i) + ": "))
 
-for n in tamanios:
-
-    desordenado = []
-    for k in range(n):
-        desordenado.append(random.randint(1, 100000))
-
-    ordenado = []
-    for k in range(n):
-        ordenado.append(k)
-
-    print("Vector de", n, "elementos")
-
-    vectores = [desordenado, ordenado]
-    nombres = ["desordenado", "ya ordenado"]
-
-    for caso in range(len(vectores)):
-
-        v = vectores[caso]
-        comparaciones = 0
-        inicio = time.perf_counter()
-
-        bajos = [0]
-        altos = [len(v) - 1]
-
-        while len(bajos) > 0:
-            bajo = bajos.pop()
-            alto = altos.pop()
-
-            if bajo < alto:
-                pivote = v[alto]    # el pivote es el ultimo
-                i = bajo - 1
-
-                for j in range(bajo, alto):
-                    comparaciones = comparaciones + 1
-                    if v[j] <= pivote:
-                        i = i + 1
-                        aux = v[i]
-                        v[i] = v[j]
-                        v[j] = aux
-
-                # el pivote va a su posicion definitiva
-                aux = v[i + 1]
-                v[i + 1] = v[alto]
-                v[alto] = aux
-                p = i + 1
-
-                # se anotan los tramos que faltan ordenar
-                if p + 1 < alto:
-                    bajos.append(p + 1)
-                    altos.append(alto)
-                if bajo < p - 1:
-                    bajos.append(bajo)
-                    altos.append(p - 1)
-
-        fin = time.perf_counter()
-        tiempo = round(fin - inicio, 5)
-
-        print("  ", nombres[caso], ":", comparaciones, "comparaciones en", tiempo, "segundos")
-
-    print()
+print("Vector original: " + str(vector))
+print("")
+quicksort(vector, 0, n - 1)
+print("")
+print("Vector ordenado: " + str(vector))
