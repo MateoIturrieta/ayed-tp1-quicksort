@@ -4,7 +4,9 @@ Trabajo Práctico · Algoritmo y Estructura de Datos · Comisión 2 · UTN
 
 Método: **Quicksort** con el pivote en el último elemento.
 
-El código está en **`quicksort.py`**.
+El código está en **`quicksort.py`**. Ordena vectores de distintos tamaños (500, 1.000, 2.000, 4.000
+y 8.000 elementos), uno desordenado y uno ya ordenado de cada tamaño, y muestra cuántas
+comparaciones hace el algoritmo en cada caso.
 
 ---
 
