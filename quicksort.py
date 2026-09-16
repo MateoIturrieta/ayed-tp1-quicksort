@@ -1,10 +1,11 @@
 # Quicksort con el pivote en el ultimo elemento
 # Trabajo Practico - Algoritmo y Estructura de Datos - Grupo 38
 #
-# Se ordenan vectores de distintos tamanios y se cuenta cuantas
-# comparaciones hace el algoritmo en cada caso.
+# Se ordenan vectores de distintos tamanios y se muestra, para cada uno,
+# cuantas comparaciones hizo el algoritmo y cuanto tiempo tardo.
 
 import random
+import time
 
 random.seed(38)     # asi los numeros al azar son siempre los mismos
 
@@ -32,6 +33,8 @@ for n in tamanios:
 
         v = vectores[caso]
         comparaciones = 0
+
+        inicio = time.perf_counter()    # se empieza a medir el tiempo
 
         # ---------------- QUICKSORT ----------------
 
@@ -85,6 +88,9 @@ for n in tamanios:
 
         # --------------------------------------------
 
-        print("  ", nombres[caso], ":", comparaciones, "comparaciones")
+        fin = time.perf_counter()       # se termina de medir el tiempo
+        tiempo = round(fin - inicio, 5)
+
+        print("  ", nombres[caso], ":", comparaciones, "comparaciones en", tiempo, "segundos")
 
     print()
