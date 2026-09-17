@@ -1,12 +1,9 @@
-# Pruebas de Quicksort - Grupo 38
-# Mismas funciones que quicksort.py, sin los mensajes por pantalla,
-# con un contador de comparaciones y la medicion del tiempo.
-
 import random
 import sys
 import time
 
-sys.setrecursionlimit(10000)  # con un vector ya ordenado la recursion llega a n niveles
+# con un vector ya ordenado la recursion llega a n niveles
+sys.setrecursionlimit(10000)
 
 comparaciones = 0
 

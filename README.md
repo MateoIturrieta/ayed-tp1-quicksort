@@ -6,8 +6,9 @@ Método: **Quicksort** con el pivote en el último elemento.
 
 | Archivo | Qué hace |
 |---|---|
-| `quicksort.py` | El programa del grupo. Pide los valores por teclado y muestra cada paso del ordenamiento. |
-| `pruebas.py` | Las mismas funciones, aplicadas a vectores de 500 a 8.000 elementos. Muestra cuántas comparaciones hace el algoritmo y cuánto tarda en cada caso. |
+| `quicksort.py` | El método Quicksort. |
+| `paso_a_paso.py` | Pide los valores por teclado y muestra cada paso del ordenamiento. |
+| `pruebas.py` | Ordena vectores de 500 a 8.000 elementos y muestra cuántas comparaciones hace y cuánto tarda. |
 
 ---
 
