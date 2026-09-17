@@ -1,0 +1,1424 @@
+<title>Quicksort Grupo 38 en video</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600;700&family=Atkinson+Hyperlegible+Next:wght@400;600;700;800&display=swap">
+<style>
+/* Una sola apariencia clara, pensada para proyector y TV. */
+:root{
+  --fondo:#eef1f5;
+  --lienzo:#f8f9fb;
+  --tarjeta:#ffffff;
+  --tinta:#0e141b;
+  --tinta-2:#46505c;
+  --tinta-3:#7a8490;
+  --linea:#d9dee5;
+  --azul:#2a78d6;          /* vector desordenado */
+  --azul-suave:#e3eefb;
+  --naranja:#eb6834;       /* vector ya ordenado */
+  --naranja-suave:#fde9e0;
+  --agua:#139468;          /* zona de menores o iguales (borde) */
+  --agua-suave:#daf3ea;
+  --agua-texto:#0b6446;
+  --fijo:#0e141b;          /* pivote ya ubicado */
+  --sans:"Atkinson Hyperlegible Next","Segoe UI",system-ui,sans-serif;
+  --mono:"Atkinson Hyperlegible Mono",ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; padding-inline:0; background:var(--fondo); color:var(--tinta);
+  font-family:var(--sans); overflow:hidden; -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- escenario 16:9 ---------- */
+.marco{position:fixed; inset:0}
+.escenario{
+  width:1600px; height:900px; position:absolute; left:50%; top:50%;
+  background:var(--lienzo); border-radius:18px;
+  box-shadow:0 2px 6px rgba(14,20,27,.06), 0 24px 60px rgba(14,20,27,.10);
+  transform-origin:center center; overflow:hidden;
+}
+:fullscreen .escenario{border-radius:0; box-shadow:none}
+.diapo{
+  position:absolute; inset:0; padding:64px 88px 96px;
+  display:flex; flex-direction:column;
+  opacity:0; visibility:hidden; transition:opacity .35s ease;
+}
+.diapo.activa{opacity:1; visibility:visible}
+
+.seccion{
+  font-family:var(--mono); font-size:22px; font-weight:600; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--tinta-3); margin:0 0 14px;
+}
+h1,h2{margin:0; font-weight:800; letter-spacing:-.02em; line-height:1.04; text-wrap:balance}
+h2{font-size:68px; margin-bottom:36px}
+.cuerpo{flex:1; display:flex; gap:48px; min-height:0}
+
+/* ---------- pie ---------- */
+.pie{
+  position:absolute; left:88px; right:88px; bottom:34px;
+  display:flex; align-items:center; justify-content:space-between; gap:24px;
+  font-size:20px; color:var(--tinta-3);
+}
+.pie .marca b{color:var(--tinta-2)}
+.pie .quien-habla{font-weight:700; color:var(--tinta-2)}
+.puntos{display:flex; gap:7px}
+.puntos i{width:22px; height:6px; border-radius:3px; background:var(--linea); transition:background .3s}
+.puntos i.on{background:var(--tinta)}
+
+/* ---------- piezas comunes ---------- */
+.tarjeta{background:var(--tarjeta); border:1.5px solid var(--linea); border-radius:20px; padding:34px 38px}
+.etq{display:inline-flex; align-items:center; gap:10px; font-weight:700; font-size:24px; padding:6px 16px; border-radius:999px}
+.etq.azul{background:var(--azul-suave); color:#1d5ba6}
+.etq.naranja{background:var(--naranja-suave); color:#b04517}
+.etq i{width:14px; height:14px; border-radius:50%; display:block}
+.etq.azul i{background:var(--azul)}
+.etq.naranja i{background:var(--naranja)}
+code.c{font-family:var(--mono); font-size:.88em; background:var(--fondo); border:1.5px solid var(--linea); border-radius:8px; padding:0 8px}
+
+/* ---------- portada y separadores ---------- */
+.apertura{justify-content:center}
+.apertura .kicker{font-family:var(--mono); font-size:26px; letter-spacing:.14em; color:var(--tinta-3); text-transform:uppercase}
+.apertura h1{font-size:132px; margin:14px 0 16px}
+.apertura .sub{font-size:38px; color:var(--tinta-2); margin:0 0 44px; max-width:30ch}
+.agenda{display:flex; gap:14px; flex-wrap:wrap; margin:0; padding:0; list-style:none}
+.agenda li{font-size:28px; font-weight:600; padding:12px 24px; border-radius:14px; background:var(--tarjeta); border:1.5px solid var(--linea)}
+.agenda li span{font-family:var(--mono); color:var(--tinta-3); margin-right:10px}
+.tiempo{display:inline-block; font-family:var(--mono); font-size:22px; font-weight:600; color:var(--tinta-2); background:var(--tarjeta); border:1.5px solid var(--linea); border-radius:999px; padding:6px 18px; margin-bottom:28px}
+
+.portada{align-items:center; justify-content:center; text-align:center}
+.portada .kicker{font-family:var(--mono); font-size:26px; letter-spacing:.14em; color:var(--tinta-3); text-transform:uppercase}
+.portada h1{font-size:170px; margin:6px 0 34px}
+.teaser{position:relative; width:900px; height:300px}
+.bar{
+  position:absolute; bottom:0; left:0; border-radius:14px 14px 6px 6px;
+  background:#fff; border:3px solid var(--linea);
+  display:flex; justify-content:center; padding-top:12px;
+  font-family:var(--mono); font-weight:700; font-size:36px; color:var(--tinta-2);
+  transition:transform .5s cubic-bezier(.4,0,.2,1), background-color .3s, border-color .3s, color .3s;
+}
+.bar.piv{border:6px solid var(--tinta); color:var(--tinta)}
+.bar.scan{border:3px dashed var(--tinta); color:var(--tinta)}
+.bar.lt{background:var(--agua-suave); border-color:var(--agua); color:var(--agua-texto)}
+.bar.fijo{background:var(--tinta); border-color:var(--tinta); color:#fff}
+.portada .leyenda{margin-top:34px}
+.portada .caption{font-size:30px; color:var(--tinta-2); margin:22px 0 0}
+
+/* ---------- leyenda de estados de celda ---------- */
+.leyenda{display:flex; gap:26px; flex-wrap:wrap; font-size:22px; color:var(--tinta-2)}
+.leyenda span{display:flex; align-items:center; gap:9px}
+.leyenda i{width:24px; height:24px; border-radius:6px; display:block; background:#fff; border:2.5px solid var(--linea)}
+.leyenda i.piv{border:4px solid var(--tinta)}
+.leyenda i.scan{border:2.5px dashed var(--tinta)}
+.leyenda i.lt{background:var(--agua-suave); border-color:var(--agua)}
+.leyenda i.fijo{background:var(--tinta); border-color:var(--tinta)}
+
+/* ---------- parte de Ramiro: texto + panel ---------- */
+.dos-col{display:grid; grid-template-columns:1fr 690px; gap:60px; flex:1; align-items:center; min-height:0}
+.texto .kick{font-family:var(--mono); font-size:22px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--tinta-3); margin-bottom:14px}
+.texto h2{margin-bottom:24px}
+.texto .lede{font-size:32px; line-height:1.35; color:var(--tinta-2); margin:0 0 26px}
+.texto .lede b{color:var(--tinta)}
+.lista{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px}
+.lista li{position:relative; padding-left:34px; font-size:29px; line-height:1.35}
+.lista li::before{content:""; position:absolute; left:0; top:.42em; width:14px; height:14px; border-radius:4px; background:var(--tinta)}
+.panel{background:var(--tarjeta); border:1.5px solid var(--linea); border-radius:22px; padding:38px 44px; display:flex; flex-direction:column; gap:14px}
+.cap{font-family:var(--mono); font-size:20px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--tinta-3); display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+.chip{font-family:var(--sans); font-size:18px; letter-spacing:0; text-transform:none; font-weight:700; padding:3px 12px; border-radius:999px}
+.chip.piv{background:#fff; border:3px solid var(--tinta); color:var(--tinta)}
+.chip.fijo{background:var(--tinta); color:#fff}
+.vec{display:flex; gap:10px; padding-bottom:36px}
+.cel{
+  width:76px; height:76px; border-radius:14px; flex:none; position:relative;
+  display:grid; place-items:center; background:#fff; border:2.5px solid var(--linea);
+  font-family:var(--mono); font-size:34px; font-weight:700; color:var(--tinta);
+}
+.cel .i{position:absolute; bottom:-32px; left:0; right:0; text-align:center; font-size:20px; font-weight:400; color:var(--tinta-3)}
+.cel.piv{border:5px solid var(--tinta)}
+.cel.fijo{background:var(--tinta); border-color:var(--tinta); color:#fff}
+.cel.lt{background:var(--agua-suave); border-color:var(--agua); color:var(--agua-texto)}
+.cel.gris{opacity:.38}
+.cel.destino{border:3px dashed var(--tinta)}
+.cel.chica{width:62px; height:62px; font-size:28px; border-radius:12px}
+.llave{height:16px; border:2.5px solid var(--tinta-3); border-bottom:none; border-radius:6px 6px 0 0; margin-top:4px; position:relative}
+.llave span{position:absolute; top:22px; left:50%; transform:translateX(-50%); font-family:var(--mono); font-size:24px; font-weight:600; color:var(--tinta-2); white-space:nowrap}
+.separado{display:flex; align-items:flex-end; gap:14px; padding-top:20px}
+.grupo{position:relative; display:flex; gap:8px; padding:18px 12px 36px; border:2.5px dashed var(--tinta-3); border-radius:14px}
+.grupo .g{position:absolute; top:-16px; left:12px; background:var(--tarjeta); padding:0 8px; font-family:var(--mono); font-size:20px; font-weight:600; color:var(--tinta-2)}
+.recur{font-family:var(--mono); font-size:22px; color:var(--tinta-2); text-align:center; margin:4px 0 0}
+.duo{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+.mini{background:var(--lienzo); border:1.5px solid var(--linea); border-radius:16px; padding:24px 18px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:16px}
+.mini .glifo{font-family:var(--mono); font-size:32px; font-weight:700}
+.mini .rot{font-size:24px; color:var(--tinta-2); line-height:1.3}
+.mini .cel{margin-bottom:6px}
+.mini .cel.vacio{border-style:dashed; color:var(--tinta-3)}
+.mini.grande{padding:40px 18px}
+.mini.grande .glifo{font-size:56px}
+
+/* ---------- parte de Mateo: ventajas ---------- */
+.tres{display:grid; grid-template-columns:repeat(3,1fr); gap:32px; flex:1}
+.ventaja{display:flex; flex-direction:column; gap:22px}
+.ventaja h3{font-size:42px; margin:0; letter-spacing:-.01em; line-height:1.08}
+.ventaja p{font-size:29px; line-height:1.38; color:var(--tinta-2); margin:0}
+.ilus{height:190px; display:flex; align-items:center; justify-content:center}
+.fila-celdas{display:flex; gap:8px}
+.celda{width:52px; height:52px; border-radius:10px; display:grid; place-items:center; font-family:var(--mono); font-weight:700; font-size:24px; background:#fff; color:var(--tinta-2); border:2px solid var(--linea)}
+.celda.ok{background:var(--tinta); color:#fff; border-color:var(--tinta)}
+.tachado{position:relative; opacity:.45; margin-top:14px}
+.tachado::after{content:""; position:absolute; left:-10px; right:-10px; top:50%; height:4px; background:var(--naranja); transform:rotate(-6deg)}
+.pila-v{display:flex; flex-direction:column; align-items:center}
+.pila-v small{font-size:22px; color:var(--tinta-3); margin-top:8px}
+.velocimetro{width:220px; height:130px}
+.usos{display:flex; flex-direction:column; gap:12px; width:100%}
+.uso{display:flex; justify-content:space-between; font-size:26px; padding:10px 18px; border-radius:10px; background:var(--fondo)}
+.uso span:last-child{font-family:var(--mono); color:var(--tinta-2)}
+
+/* ---------- desventajas ---------- */
+.dos-arboles{display:grid; grid-template-columns:1fr 1fr; gap:36px; flex:1}
+.arbol{display:flex; flex-direction:column}
+.arbol header{display:flex; justify-content:space-between; align-items:center; margin-bottom:18px}
+.arbol .niveles{font-size:26px; color:var(--tinta-2)}
+.arbol .niveles b{font-family:var(--mono); font-size:40px; color:var(--tinta)}
+.nivel{display:flex; gap:6px; margin-bottom:8px; opacity:0; transform:translateY(8px); transition:opacity .3s, transform .3s}
+.nivel.visto{opacity:1; transform:none}
+.nivel .c{flex:1; height:34px; border-radius:6px; background:#e7eaef}
+.azulado .c.act{background:var(--azul)}
+.naranjado .c.act{background:var(--naranja)}
+.nivel .c.piv{background:var(--fijo)}
+.nota-arbol{font-size:26px; color:var(--tinta-2); margin:auto 0 0; line-height:1.35}
+.nota-arbol b{color:var(--tinta)}
+.leyenda-c{display:flex; gap:22px; font-size:22px; color:var(--tinta-2); margin-top:14px}
+.leyenda-c span{display:flex; align-items:center; gap:8px}
+.leyenda-c i{width:22px; height:16px; border-radius:4px; display:block}
+.estable{margin-top:24px; display:flex; align-items:center; gap:28px; padding:18px 28px; border-radius:16px; background:var(--tarjeta); border:1.5px solid var(--linea)}
+.estable p{font-size:30px; margin:0; color:var(--tinta-2)}
+.estable p b{color:var(--tinta)}
+.iguales{display:flex; align-items:center; gap:14px; font-family:var(--mono); font-size:32px; font-weight:700}
+.iguales span{padding:4px 12px; border-radius:8px; background:var(--fondo)}
+.iguales sub{font-size:18px; color:var(--tinta-3)}
+.iguales .flecha{color:var(--tinta-3); background:none}
+
+/* ---------- complejidad ---------- */
+.caso{flex:1; display:flex; flex-direction:column; gap:20px}
+.caso .o{font-family:var(--mono); font-size:84px; font-weight:700; line-height:1}
+.caso.azul .o{color:var(--azul)}
+.caso.naranja .o{color:var(--naranja)}
+.caso .dice{font-size:32px; color:var(--tinta-2); margin:0; line-height:1.35}
+.caso .dice b{color:var(--tinta)}
+.barras{display:flex; flex-direction:column; gap:16px; margin-top:6px}
+.barra-fila{display:grid; grid-template-columns:150px 1fr; align-items:center; gap:18px}
+.barra-fila .rot{font-size:26px; color:var(--tinta-2)}
+.barra-fila .pista{height:52px; position:relative}
+.barra-fila .relleno{
+  height:100%; border-radius:0 10px 10px 0; width:0; transition:width .9s cubic-bezier(.2,.8,.2,1);
+  display:flex; align-items:center; justify-content:flex-end; padding-right:14px;
+  font-family:var(--mono); font-weight:700; font-size:28px; color:#fff;
+}
+.caso.azul .relleno{background:var(--azul)}
+.caso.naranja .relleno{background:var(--naranja)}
+.medido{font-size:28px; color:var(--tinta-2); margin:auto 0 0; padding-top:18px; border-top:1.5px solid var(--linea)}
+.medido b{font-family:var(--mono); color:var(--tinta)}
+
+/* ---------- pruebas ---------- */
+.grafico{flex:1.35; display:flex; flex-direction:column}
+.grafico h3{font-size:30px; margin:0 0 6px}
+.grafico .sub{font-size:24px; color:var(--tinta-3); margin:0 0 8px}
+.grafico svg{width:100%; height:auto; display:block; overflow:visible}
+.lateral{flex:1; display:flex; flex-direction:column; gap:16px}
+.stat{padding:18px 26px}
+.stat .quien{margin-bottom:8px}
+.stat .valores{display:flex; gap:36px; align-items:baseline}
+.stat .v{font-family:var(--mono); font-weight:700; font-size:42px; line-height:1}
+.stat .u{font-size:22px; color:var(--tinta-3); display:block; margin-top:6px}
+.veces{display:flex; align-items:baseline; gap:18px; padding:4px 4px 0}
+.veces .x{font-family:var(--mono); font-size:64px; font-weight:700; line-height:1}
+.veces p{font-size:28px; color:var(--tinta-2); margin:0; line-height:1.25}
+.recursion{font-size:26px; line-height:1.35; color:var(--tinta-2); padding:14px 22px; border-radius:14px; background:var(--naranja-suave)}
+.recursion code{font-family:var(--mono); font-weight:700; color:#8f3510; font-size:24px}
+.tip{position:absolute; pointer-events:none; background:var(--tinta); color:#fff; padding:10px 14px; border-radius:10px; font-size:22px; line-height:1.3; opacity:0; transition:opacity .12s; white-space:nowrap; z-index:5}
+.tip b{font-family:var(--mono)}
+
+/* ---------- cuándo conviene ---------- */
+.columna{flex:1; display:flex; flex-direction:column; gap:22px}
+.columna .cabeza{display:flex; align-items:center; gap:18px; font-size:44px; font-weight:800}
+.marca-si,.marca-no{width:62px; height:62px; border-radius:50%; display:grid; place-items:center; flex:none}
+.marca-si{background:var(--azul)}
+.marca-no{background:var(--naranja)}
+.item{display:flex; gap:22px; align-items:flex-start; font-size:34px; line-height:1.3; padding:24px 30px; border-radius:18px; background:var(--tarjeta); border:1.5px solid var(--linea)}
+.item small{display:block; font-size:25px; color:var(--tinta-3); margin-top:6px}
+.item .n{font-family:var(--mono); font-weight:700; color:var(--tinta-3); min-width:36px}
+
+/* ---------- conclusión ---------- */
+.decisiones{display:flex; flex-direction:column; gap:12px}
+.decision{display:grid; grid-template-columns:1fr 60px 1.05fr; align-items:center; padding:14px 28px; border-radius:18px; background:var(--tarjeta); border:1.5px solid var(--linea); border-left-width:10px; font-size:31px; line-height:1.2}
+.decision.si{border-left-color:var(--azul)}
+.decision.no{border-left-color:var(--naranja)}
+.decision.duda{border-left-color:var(--agua)}
+.decision .flecha{color:var(--tinta-3); text-align:center; font-size:38px}
+.decision .res{font-weight:800}
+.decision .res small{display:block; font-size:21px; font-weight:400; color:var(--tinta-2); margin-top:3px}
+.decision.si .res b{color:#1d5ba6}
+.decision.no .res b{color:#b04517}
+.decision.duda .res b{color:var(--agua-texto)}
+.evidencia{display:grid; grid-template-columns:1fr 1fr 250px; gap:16px; margin-top:20px}
+.ev{padding:12px 22px; border-radius:16px}
+.ev small{display:block; font-size:20px; font-weight:600}
+.ev strong{display:block; font-family:var(--mono); font-size:38px; line-height:1.15}
+.ev strong em{font-style:normal; font-size:22px; font-weight:400}
+.ev.azul{background:var(--azul-suave); color:#1d5ba6}
+.ev.naranja{background:var(--naranja-suave); color:#b04517}
+.ev.total{background:var(--tinta); color:#fff; display:flex; flex-direction:column; justify-content:center}
+.ev.total strong{font-family:var(--sans); font-size:42px; font-weight:800}
+.cita{margin:auto 0 0; font-size:40px; font-weight:800; line-height:1.15; letter-spacing:-.015em; padding-left:28px; border-left:10px solid var(--tinta); text-wrap:balance}
+
+/* ---------- muchas gracias ---------- */
+.gracias-d{padding:0; justify-content:center; align-items:center; text-align:center}
+.gracias-d canvas{position:absolute; inset:0; width:1600px; height:900px}
+.gracias-d .velo{position:absolute; inset:0; background:radial-gradient(ellipse 760px 380px at 50% 50%, rgba(248,249,251,.97) 0%, rgba(248,249,251,.9) 55%, rgba(248,249,251,0) 100%)}
+.gr-centro{position:relative; display:flex; flex-direction:column; align-items:center}
+.gr-prompt{font-family:var(--mono); font-size:34px; color:var(--tinta-2); min-height:46px; white-space:pre}
+.gr-prompt .pr{color:var(--azul); font-weight:700}
+.gr-prompt .kw{color:#1d4fa3; font-weight:700}
+.gr-prompt .st{color:#9a3d12}
+.cursor{display:inline-block; width:16px; height:36px; margin-left:4px; vertical-align:-6px; background:var(--tinta); animation:parpadeo 1s steps(1) infinite}
+@keyframes parpadeo{50%{opacity:0}}
+.gr-titulo{font-family:var(--mono); font-size:138px; letter-spacing:-.04em; margin:18px 0 6px; opacity:0; transform:translateY(14px); transition:opacity .6s, transform .6s}
+.gr-titulo.visto{opacity:1; transform:none}
+.gr-sub{font-size:36px; color:var(--tinta-2); margin:0 0 34px}
+.gr-equipo{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; max-width:1440px}
+.gr-equipo span{font-size:25px; font-weight:700; padding:8px 18px; border-radius:999px; background:var(--tarjeta); border:1.5px solid var(--linea)}
+.gr-fin{margin-top:30px; font-family:var(--mono); font-size:22px; color:var(--agua-texto)}
+.gracias-d ~ .pie{z-index:2}
+
+/* ---------- notas (tecla N) y ayuda ---------- */
+.notas{position:fixed; left:50%; bottom:18px; transform:translateX(-50%); width:min(1100px, calc(100% - 32px)); max-height:40vh; overflow:auto; background:rgba(14,20,27,.94); color:#f2f4f7; border-radius:14px; padding:18px 24px; font-size:19px; line-height:1.5; z-index:20}
+.notas h4{margin:0 0 6px; font-family:var(--mono); font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:#9aa6b3}
+.notas p{margin:0}
+.ayuda{position:fixed; top:14px; right:16px; z-index:20; font-size:14px; color:var(--tinta-3); background:rgba(255,255,255,.85); border:1px solid var(--linea); border-radius:10px; padding:8px 12px; transition:opacity .4s}
+.ayuda kbd{font-family:var(--mono); background:var(--fondo); border:1px solid var(--linea); border-radius:5px; padding:1px 6px; color:var(--tinta)}
+.ayuda.oculta{opacity:0; pointer-events:none}
+
+
+/* ---------- reparto de partes ---------- */
+.reparto{display:flex; flex-direction:column; gap:12px; margin:0; padding:0; list-style:none; max-width:1150px}
+.reparto li{display:grid; grid-template-columns:130px 1fr auto; align-items:center; gap:24px; padding:16px 28px; border-radius:16px; background:var(--tarjeta); border:1.5px solid var(--linea)}
+.reparto .p{font-family:var(--mono); font-size:22px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--tinta-3)}
+.reparto .nom{font-size:34px; font-weight:800}
+.reparto .tema{font-size:26px; color:var(--tinta-2)}
+.reparto li.ahora{border:3px solid var(--tinta)}
+.pendiente{display:inline-block; font-family:var(--mono); font-size:22px; font-weight:600; color:var(--tinta-3); border:2px dashed var(--tinta-3); border-radius:999px; padding:6px 18px}
+
+/* ---------- parte 3: mazo y datos en una sola diapositiva ---------- */
+.mono-t{font-family:var(--mono); font-weight:700; letter-spacing:-.03em}
+.h2-chico{font-size:52px; margin-bottom:22px}
+.unido{display:grid; grid-template-columns:600px 1fr; gap:40px; flex:1; min-height:0}
+.col-tit{display:flex; align-items:center; justify-content:space-between; gap:16px; min-height:30px}
+.col-tit b{font-family:var(--mono); font-size:20px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--tinta-3)}
+.mazo-v{display:flex; flex-direction:column; gap:14px; min-height:0}
+.etapa{flex:1; min-height:0; display:grid; grid-template-columns:210px 1fr; gap:20px; align-items:center; background:var(--tarjeta); border:3px solid var(--linea); border-radius:18px; padding:10px 18px 10px 10px; opacity:.45; transition:opacity .35s, border-color .35s}
+.etapa.on{opacity:1; border-color:var(--tinta)}
+.etapa h3{font-size:30px; margin:0 0 4px; line-height:1.1; display:flex; align-items:center; gap:10px}
+.etapa p{font-size:22px; line-height:1.3; color:var(--tinta-2); margin:0}
+.etapa p b{color:var(--tinta)}
+.n-et{width:36px; height:36px; flex:none; border-radius:50%; background:var(--tinta); color:#fff; display:grid; place-items:center; font-family:var(--mono); font-size:19px; font-weight:700}
+.escena-c{height:100%; min-height:0; padding:6px 0; display:flex; align-items:center; justify-content:center; gap:7px; background:var(--lienzo); border-radius:12px}
+.cartas{display:flex; gap:5px; align-items:center}
+.cartas.junt .carta + .carta{margin-left:-14px}
+.carta{width:36px; height:58px; border-radius:7px; background:#fff; border:2px solid var(--linea); display:grid; place-items:center; font-family:var(--mono); font-size:22px; font-weight:700; color:var(--tinta); box-shadow:0 2px 5px rgba(14,20,27,.08)}
+.carta.piv{border:4px solid var(--tinta)}
+.carta.lt{background:var(--agua-suave); border-color:var(--agua); color:var(--agua-texto)}
+.carta.fijo{background:var(--tinta); border-color:var(--tinta); color:#fff}
+.monton{display:flex; flex-direction:column; align-items:center; gap:4px; margin:0 4px}
+.monton small{font-size:15px; color:var(--tinta-2); font-weight:600}
+
+.datos-der{display:flex; flex-direction:column; gap:16px; min-height:0}
+.datos-der .leyenda{gap:18px; font-size:19px}
+.datos-der .leyenda i{width:20px; height:20px}
+.vec-grande-caja{position:relative; background:var(--tarjeta); border:1.5px solid var(--linea); border-radius:20px; padding:28px 32px 84px}
+.vec-grande{display:flex; gap:14px}
+.vg{width:104px; height:104px; border-radius:16px; display:grid; place-items:center; background:#fff; border:3px solid var(--linea); font-family:var(--mono); font-size:48px; font-weight:700; color:var(--tinta); transition:background-color .35s, border-color .35s, color .35s, opacity .35s; position:relative}
+.vg .ix{position:absolute; bottom:-32px; font-size:19px; font-weight:400; color:var(--tinta-3)}
+.vg.piv{border:7px solid var(--tinta)}
+.vg.lt{background:var(--agua-suave); border-color:var(--agua); color:var(--agua-texto)}
+.vg.may{background:#eceff3; border-color:#c6cdd6}
+.vg.fijo{background:var(--tinta); border-color:var(--tinta); color:#fff}
+.vg.fuera{opacity:.28}
+.rango-g{position:absolute; bottom:30px; height:14px; border:3px solid var(--tinta-2); border-top:none; border-radius:0 0 8px 8px; transition:left .4s, width .4s, opacity .3s}
+.rango-g span{position:absolute; top:12px; left:50%; transform:translateX(-50%); font-family:var(--mono); font-size:18px; font-weight:600; color:var(--tinta-2); white-space:nowrap}
+.relato{font-size:30px; line-height:1.3; min-height:110px; display:flex; align-items:center; padding:14px 24px; border-left:8px solid var(--tinta); background:var(--tarjeta); border-radius:0 16px 16px 0}
+.relato > span{display:block}
+.relato code{font-family:var(--mono); font-size:.9em; font-weight:700}
+.llamadas{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.llamadas li{padding:12px 18px; border-radius:14px; background:var(--tarjeta); border:2px solid var(--linea); opacity:.4; transition:opacity .3s, border-color .3s}
+.llamadas li.on{opacity:1; border:3px solid var(--tinta)}
+.llamadas li.hecho{opacity:1}
+.llamadas code{display:block; font-family:var(--mono); font-size:22px; font-weight:700}
+.llamadas span{display:block; font-size:19px; color:var(--tinta-2); margin-top:2px}
+
+/* ---------- parte 4: codigo ---------- */
+.cod-grid{display:grid; grid-template-columns:1fr 940px; gap:34px; flex:1; align-items:center; min-height:0}
+.pasos-cod{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:14px}
+.pasos-cod li{display:grid; grid-template-columns:54px 1fr; gap:16px; align-items:center; padding:16px 20px; border-radius:16px; border:2px solid transparent; opacity:.42; transition:opacity .3s, background-color .3s, border-color .3s}
+.pasos-cod li.on{opacity:1; background:var(--tarjeta); border-color:var(--tinta)}
+.pasos-cod .letra{width:54px; height:54px; border-radius:50%; background:var(--tinta); color:#fff; display:grid; place-items:center; font-family:var(--mono); font-size:26px; font-weight:700}
+.pasos-cod b{display:block; font-size:28px; line-height:1.15}
+.pasos-cod small{display:block; font-family:var(--mono); font-size:20px; color:var(--tinta-2); margin-top:4px}
+.codigo{margin:0; background:var(--tarjeta); border:1.5px solid var(--linea); border-radius:20px; padding:24px 0; font-family:var(--mono); font-size:21px; line-height:1.66; overflow:hidden}
+.codigo .ln{display:flex; padding:0 26px 0 18px; border-left:7px solid transparent; white-space:pre; transition:background-color .3s, border-color .3s}
+.codigo .ln .nro{width:34px; flex:none; text-align:right; margin-right:22px; color:var(--tinta-3)}
+.codigo .ln.on{background:#fff1c2; border-left-color:var(--tinta)}
+.codigo .kw{color:#1d4fa3; font-weight:700}
+.codigo .fn{color:#0b6446}
+.codigo .st{color:#9a3d12}
+.codigo .nm{color:#0b6446}
+.codigo .cm{color:var(--tinta-3); font-style:italic}
+.ejemplo-salida{margin-top:28px; padding:18px 22px; background:#0f151c; border-radius:14px; color:#d7dee6}
+.ejemplo-salida small{display:block; font-size:20px; color:#8d98a5; margin-bottom:6px}
+.ejemplo-salida code{font-family:var(--mono); font-size:23px; white-space:nowrap}
+.ejemplo-salida code b{color:#ffd166}
+.leyenda i.may{background:#eceff3; border-color:#c6cdd6}
+
+@media (prefers-reduced-motion:reduce){ *{transition:none !important} }
+</style>
+
+<div class="marco"><div class="escenario" id="escenario">
+
+  <!-- ============================================ PORTADA DEL VIDEO -->
+  <section class="diapo portada" id="d-portada" data-presentador="Santino Ribba" data-nota="Portada del video. La animación muestra a Quicksort ordenando el vector [8, 3, 9, 5, 1, 7, 4].">
+    <div class="kicker">Algoritmo y Estructura de Datos · Grupo 38</div>
+    <h1>Quicksort</h1>
+    <div class="teaser" id="teaser" aria-hidden="true"></div>
+    <div class="leyenda">
+      <span><i class="piv"></i>pivote</span>
+      <span><i class="scan"></i>comparando</span>
+      <span><i class="lt"></i>menor o igual al pivote</span>
+      <span><i class="fijo"></i>ya en su lugar</span>
+    </div>
+    <p class="caption">Ordena un vector solo comparando e intercambiando elementos.</p>
+  </section>
+
+  <!-- ============================================ SANTINO · PRESENTACIÓN -->
+  <section class="diapo apertura" data-presentador="Santino Ribba" data-nota="Presentación del método y de cómo está organizado el video: cada integrante explica una parte.">
+    <div class="kicker">Parte 1 · Presentación</div>
+    <h1 style="font-size:96px">Santino Ribba</h1>
+    <p class="sub" style="margin-bottom:24px">Así está organizado el video.</p>
+    <ul class="reparto">
+      <li class="ahora"><span class="p">Parte 1</span><span class="nom">Santino Ribba</span><span class="tema">Presentación</span></li>
+      <li><span class="p">Parte 2</span><span class="nom">Ramiro Novarino</span><span class="tema">Cómo funciona</span></li>
+      <li><span class="p">Parte 3</span><span class="nom">Joaquín Manavella</span><span class="tema">Del mazo de cartas a los datos</span></li>
+      <li><span class="p">Parte 4</span><span class="nom">Juan Martín Villagra Vay</span><span class="tema">Del algoritmo al código</span></li>
+      <li><span class="p">Parte 5</span><span class="nom">Mateo Iturrieta</span><span class="tema">Ventajas, complejidad y pruebas</span></li>
+      <li><span class="p">Cierre</span><span class="nom">Santino Ribba</span><span class="tema">Cuándo conviene y conclusión</span></li>
+    </ul>
+  </section>
+
+  <!-- ============================================ RAMIRO · SEPARADOR -->
+  <section class="diapo apertura" data-presentador="Ramiro Novarino" data-nota="Cómo funciona Quicksort paso a paso, cuándo termina y qué condiciones necesita para poder aplicarse.">
+    <div class="kicker">Parte 2 · Cómo funciona</div>
+    <h1>Ramiro Novarino</h1>
+    <p class="sub">Paso a paso, cuándo termina y qué condiciones necesita para aplicarse.</p>
+    <ul class="agenda">
+      <li><span>1</span>El rango de trabajo</li>
+      <li><span>2</span>Los 4 pasos</li>
+      <li><span>3</span>Cuándo termina</li>
+      <li><span>4</span>Condiciones</li>
+    </ul>
+  </section>
+
+  <!-- ============================================ RAMIRO · RANGO -->
+  <section class="diapo" data-presentador="Ramiro Novarino" data-nota="Quicksort no mira siempre todo el vector: en cada llamada trabaja sobre un rango definido por un índice bajo (inicio) y un índice alto (fin). bajo marca el primer elemento del rango; alto, el último. Ese rango cambia en cada llamada recursiva y se va achicando.">
+    <div class="dos-col">
+      <div class="texto">
+        <div class="kick">El rango de trabajo</div>
+        <h2>Dos índices delimitan qué se ordena</h2>
+        <p class="lede">En cada llamada, Quicksort trabaja sobre un rango entre <b>bajo</b> y <b>alto</b>.</p>
+        <ul class="lista">
+          <li><code class="c">bajo</code> marca el primer elemento del rango.</li>
+          <li><code class="c">alto</code> marca el último elemento del rango.</li>
+          <li>El rango se achica en cada llamada recursiva.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <span class="cap">Vector de ejemplo</span>
+        <div class="vec" id="v-rango"></div>
+        <div class="llave"><span>bajo = 0 … alto = 6</span></div>
+        <div style="height:30px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ RAMIRO · PASO 1 -->
+  <section class="diapo" data-presentador="Ramiro Novarino" data-nota="Paso 1, elegir un pivote. En esta implementación el criterio es fijo: el pivote siempre es el último elemento del rango, vector[alto]. No se elige al azar ni se calcula una mediana. Todo el resto del algoritmo gira alrededor de compararse contra este valor.">
+    <div class="dos-col">
+      <div class="texto">
+        <div class="kick">Paso 1</div>
+        <h2>Elegir un pivote</h2>
+        <p class="lede">El criterio es fijo: el pivote siempre es el <b>último elemento</b> del rango.</p>
+        <ul class="lista">
+          <li>Siempre es <code class="c">vector[alto]</code>: no se elige al azar.</li>
+          <li>Todo lo demás se compara contra este valor.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <span class="cap">Se toma vector[alto] <span class="chip piv">pivote</span></span>
+        <div class="vec" id="v-paso1"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ RAMIRO · PASO 2 -->
+  <section class="diapo" data-presentador="Ramiro Novarino" data-nota="Paso 2, particionar. Se recorre el rango desde bajo hasta alto menos uno, comparando cada elemento con el pivote. Si un elemento es menor o igual al pivote, se lo intercambia hacia la izquierda. Así se agrupan los elementos chicos al principio del rango. El pivote todavía no se mueve.">
+    <div class="dos-col">
+      <div class="texto">
+        <div class="kick">Paso 2</div>
+        <h2>Particionar el vector</h2>
+        <p class="lede">Se recorre de <code class="c">bajo</code> a <code class="c">alto − 1</code>, comparando cada elemento con el pivote.</p>
+        <ul class="lista">
+          <li>Si es <b>menor o igual</b> al pivote, se intercambia hacia la izquierda.</li>
+          <li>Los elementos chicos quedan juntos al principio.</li>
+          <li>El pivote todavía no se mueve.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <span class="cap">Antes de recorrer</span>
+        <div class="vec" id="v-paso2a"></div>
+        <span class="cap">Después de recorrer <span class="chip piv">pivote sin mover</span></span>
+        <div class="vec" id="v-paso2b"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ RAMIRO · PASO 3 -->
+  <section class="diapo" data-presentador="Ramiro Novarino" data-nota="Paso 3, ubicar el pivote. El pivote se intercambia con el primer elemento mayor que él encontrado durante el recorrido. Desde ese intercambio el pivote queda fijo: ya está en la posición que le corresponde en el vector ordenado y nunca más se mueve.">
+    <div class="dos-col">
+      <div class="texto">
+        <div class="kick">Paso 3</div>
+        <h2>Ubicar el pivote en su lugar final</h2>
+        <p class="lede">Se intercambia con el <b>primer elemento mayor</b> que él.</p>
+        <ul class="lista">
+          <li>Desde ahí, el pivote queda <b>fijo</b>.</li>
+          <li>Ya está en su posición del vector ordenado: no se vuelve a mover.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <span class="cap">Se intercambia con el primer mayor</span>
+        <div class="vec" id="v-paso3a"></div>
+        <span class="cap">Pivote en su posición <span class="chip fijo">fijo</span></span>
+        <div class="vec" id="v-paso3b"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ RAMIRO · PASO 4 -->
+  <section class="diapo" data-presentador="Ramiro Novarino" data-nota="Paso 4, repetir recursivamente. Con el pivote fijo, el mismo proceso se aplica por separado a cada lado: la mitad izquierda se ordena como un vector independiente y la derecha como otro. Cada mitad recibe sus propios bajo y alto.">
+    <div class="dos-col">
+      <div class="texto">
+        <div class="kick">Paso 4</div>
+        <h2>Repetir, recursivamente</h2>
+        <p class="lede">Con el pivote fijo, se aplica lo mismo <b>a cada lado</b>, por separado.</p>
+        <ul class="lista">
+          <li>La mitad izquierda se ordena como un vector aparte.</li>
+          <li>La mitad derecha, como otro.</li>
+          <li>Cada una tiene sus propios <code class="c">bajo</code> y <code class="c">alto</code>.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <span class="cap">El pivote fijo separa dos partes</span>
+        <div class="separado" id="v-paso4"></div>
+        <p class="recur">quicksort(izquierda) ← fijo → quicksort(derecha)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ RAMIRO · CUÁNDO TERMINA -->
+  <section class="diapo" data-presentador="Ramiro Novarino" data-nota="¿Cuándo termina? Cuando, en una llamada, el rango a ordenar queda vacío o con un solo elemento. Formalmente, cuando bajo ya no es menor que alto. Ahí no hay nada para particionar: un solo elemento ya está ordenado.">
+    <div class="dos-col">
+      <div class="texto">
+        <div class="kick">Corte de la recursión</div>
+        <h2>¿Cuándo termina?</h2>
+        <p class="lede">Cuando el rango queda <b>vacío</b> o con <b>un solo elemento</b>.</p>
+        <ul class="lista">
+          <li>Es decir, cuando <code class="c">bajo</code> ya no es menor que <code class="c">alto</code>.</li>
+          <li>Un solo elemento ya está ordenado.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <div class="duo">
+          <div class="mini">
+            <div class="glifo">bajo = alto</div>
+            <div class="cel fijo">5<span class="i">0</span></div>
+            <div class="rot" style="margin-top:22px">Un solo elemento:<br>ya ordenado</div>
+          </div>
+          <div class="mini">
+            <div class="glifo">bajo &gt; alto</div>
+            <div class="cel vacio">∅</div>
+            <div class="rot" style="margin-top:22px">Rango vacío:<br>no hay nada que hacer</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ RAMIRO · CONDICIONES -->
+  <section class="diapo" data-presentador="Ramiro Novarino" data-nota="Condiciones para usarlo. Los elementos tienen que ser comparables entre sí, como números o textos que se comparan alfabéticamente, y la estructura tiene que permitir acceder por índice, algo que un vector permite sin problema.">
+    <div class="dos-col">
+      <div class="texto">
+        <div class="kick">Condiciones para usarlo</div>
+        <h2>Qué necesita el vector</h2>
+        <p class="lede">Para aplicar Quicksort así, se tienen que cumplir <b>dos requisitos</b>.</p>
+        <ul class="lista">
+          <li>Elementos <b>comparables</b>: números, o textos en orden alfabético.</li>
+          <li><b>Acceso por índice</b>, algo que un vector permite.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <div class="duo">
+          <div class="mini grande"><div class="glifo">a ≤ b</div><div class="rot">Elementos<br>comparables</div></div>
+          <div class="mini grande"><div class="glifo">v[i]</div><div class="rot">Acceso directo<br>por índice</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ JOAQUÍN · SEPARADOR -->
+  <section class="diapo apertura" data-presentador="Joaquín Manavella" data-nota="Hola, soy Joaquin Manavella. Vamos a retomar el ejemplo de la vida cotidiana y después vamos a ver un ejemplo concreto con datos, paso a paso.">
+    <div class="kicker">Parte 3 · Ejemplo cotidiano y con datos</div>
+    <h1>Joaquín Manavella</h1>
+    <p class="sub">Del mazo de cartas a un vector real, paso a paso.</p>
+    <ul class="agenda">
+      <li><span>1</span>El mazo de cartas</li>
+      <li><span>2</span>El mismo proceso con datos</li>
+    </ul>
+  </section>
+
+  <!-- ============================================ JOAQUÍN · MAZO Y DATOS -->
+  <section class="diapo" id="d-datos" data-presentador="Joaquín Manavella" data-nota="Como dijo Santino, pensemos en ordenar un mazo de cartas: elegimos una carta como pivote, separamos el resto en 'menores' y 'mayores' que esa carta, ubicamos el pivote en su lugar definitivo, y repetimos la misma operación con cada montón más chico, hasta que no queda ningún montón para dividir. Ahora veamos esto con números concretos, usando nuestro código. Supongamos el vector [8, 3, 7, 4, 9, 2]. Se llama a quicksort(vector, 0, 5). El pivote elegido es el último elemento: 2. Se recorre el vector comparando cada elemento con 2. Como ningún elemento es menor o igual a 2 (salvo el propio 2), no hay intercambios previos, y el pivote 2 se coloca en la posición 0. Vector queda: [2, 3, 7, 4, 9, 8]; el 2 ya está en su posición final. Ahora se ordena recursivamente la parte derecha: [3, 7, 4, 9, 8], con pivote 8. Se comparan los elementos con 8: 3, 7, 4 y 9 son evaluados; todos menos el 9 son menores, así que se van agrupando a la izquierda mediante intercambios. El pivote 8 se ubica en su posición final, quedando [2, 3, 7, 4, 8, 9]. El proceso se sigue repitiendo con cada sub-vector cada vez más chico, hasta que todos los elementos quedan ordenados. Vector final ordenado: [2, 3, 4, 7, 8, 9].">
+    <div class="seccion">Ejemplo cotidiano y con datos</div>
+    <h2 class="h2-chico">Del mazo de cartas a <span class="mono-t">[8, 3, 7, 4, 9, 2]</span></h2>
+    <div class="unido">
+      <div class="mazo-v">
+        <div class="col-tit"><b>Con cartas</b></div>
+        <div class="etapa" data-e="1">
+          <div class="escena-c"><div class="cartas"><span class="carta">8</span><span class="carta">3</span><span class="carta">9</span><span class="carta">2</span><span class="carta piv">5</span></div></div>
+          <div><h3><span class="n-et">1</span>Elegir una carta</h3><p>Esa carta es el <b>pivote</b>.</p></div>
+        </div>
+        <div class="etapa" data-e="2">
+          <div class="escena-c">
+            <div class="monton"><small>menores</small><div class="cartas junt"><span class="carta lt">3</span><span class="carta lt">2</span></div></div>
+            <div class="monton"><small>mayores</small><div class="cartas junt"><span class="carta">8</span><span class="carta">9</span></div></div>
+          </div>
+          <div><h3><span class="n-et">2</span>Separar el resto</h3><p>En <b>menores</b> y <b>mayores</b> que el pivote.</p></div>
+        </div>
+        <div class="etapa" data-e="3">
+          <div class="escena-c"><div class="cartas junt"><span class="carta lt">3</span><span class="carta lt">2</span></div><span class="carta fijo">5</span><div class="cartas junt"><span class="carta">8</span><span class="carta">9</span></div></div>
+          <div><h3><span class="n-et">3</span>Ubicar el pivote</h3><p>Queda en su <b>lugar definitivo</b>.</p></div>
+        </div>
+        <div class="etapa" data-e="4">
+          <div class="escena-c"><div class="cartas"><span class="carta fijo">2</span><span class="carta fijo">3</span><span class="carta fijo">5</span><span class="carta fijo">8</span><span class="carta fijo">9</span></div></div>
+          <div><h3><span class="n-et">4</span>Repetir</h3><p>Con cada montón, hasta que no hay <b>nada que dividir</b>.</p></div>
+        </div>
+      </div>
+      <div class="datos-der">
+        <div class="col-tit"><b>Con nuestro código</b>
+          <div class="leyenda">
+            <span><i class="piv"></i>pivote</span>
+            <span><i class="lt"></i>menor o igual</span>
+            <span><i class="may"></i>mayor</span>
+            <span><i class="fijo"></i>en su lugar</span>
+          </div>
+        </div>
+        <div class="vec-grande-caja">
+          <div class="vec-grande" id="vg"></div>
+          <div class="rango-g" id="rg"><span id="rg-t"></span></div>
+        </div>
+        <div class="relato"><span id="relato"></span></div>
+        <ol class="llamadas" id="llamadas">
+          <li><code>quicksort(vector, 0, 5)</code><span>pivote 2 → posición 0</span></li>
+          <li><code>quicksort(vector, 1, 5)</code><span>pivote 8 → posición 4</span></li>
+          <li><code>quicksort(vector, 1, 3)</code><span>pivote 4 → posición 2</span></li>
+          <li class="fin"><code>[2, 3, 4, 7, 8, 9]</code><span>vector ordenado</span></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ JUAN MARTÍN · SEPARADOR -->
+  <section class="diapo apertura" data-presentador="Juan Martín Villagra Vay" data-nota="Hola, soy Juan. Ahora vamos a relacionar el algoritmo que explicamos con nuestra implementación en Python. No vamos a explicar línea por línea, sino mostrar cómo cada paso del algoritmo se traduce en código.">
+    <div class="kicker">Parte 4 · Del algoritmo al código</div>
+    <h1>Juan Martín Villagra Vay</h1>
+    <p class="sub">Cómo cada paso del algoritmo se traduce en Python.</p>
+    <ul class="agenda">
+      <li><span>1</span>particionar</li>
+      <li><span>2</span>quicksort</li>
+      <li><span>3</span>mostrar</li>
+    </ul>
+  </section>
+
+  <!-- ============================================ JUAN MARTÍN · PARTICIONAR -->
+  <section class="diapo cod-diapo" data-presentador="Juan Martín Villagra Vay" data-nota="Función particionar: acá es donde ocurre la parte central del algoritmo. En el algoritmo, primero se elige el pivote. En nuestro código esto se hace con pivote = vector[alto]. Después, en el algoritmo se recorre el rango buscando los elementos menores o iguales al pivote. En nuestro código esto se realiza con el for j in range(bajo, alto), y la condición if vector[j] <= pivote. Cuando se encuentra uno, en el algoritmo se lo agrupa a la izquierda. En nuestro código esto se hace incrementando el índice i y haciendo un intercambio manual entre vector[i] y vector[j], sin usar ninguna función externa, solo con una variable auxiliar temp. Finalmente, en el algoritmo se ubica el pivote en su posición definitiva. En nuestro código esto se hace intercambiando vector[i + 1] con vector[alto], y se retorna i + 1, que es la posición final del pivote.">
+    <div class="seccion">Del algoritmo al código</div>
+    <h2>Función <span class="mono-t">particionar</span></h2>
+    <div class="cod-grid">
+      <ol class="pasos-cod">
+        <li data-lineas="1"><span class="letra">1</span><div><b>Elegir el pivote</b><small>pivote = vector[alto]</small></div></li>
+        <li data-lineas="3,4"><span class="letra">2</span><div><b>Buscar los menores o iguales</b><small>for + if vector[j] &lt;= pivote</small></div></li>
+        <li data-lineas="5,6,7,8"><span class="letra">3</span><div><b>Agruparlos a la izquierda</b><small>i = i + 1 e intercambio con temp</small></div></li>
+        <li data-lineas="10,11,12,13"><span class="letra">4</span><div><b>Ubicar el pivote</b><small>vector[i + 1] ↔ vector[alto], return i + 1</small></div></li>
+      </ol>
+      <pre class="codigo" data-codigo="particionar"></pre>
+    </div>
+  </section>
+
+  <!-- ============================================ JUAN MARTÍN · QUICKSORT -->
+  <section class="diapo cod-diapo" data-presentador="Juan Martín Villagra Vay" data-nota="Función quicksort: acá se aplica la parte recursiva del algoritmo. La condición if bajo < alto representa la condición de corte: si el rango tiene un solo elemento o está vacío, no se hace nada, y ahí es donde el algoritmo termina para esa rama. Se llama a particionar para obtener la posición final del pivote. Y después, en el algoritmo se repite el proceso con la mitad izquierda y la mitad derecha; en nuestro código esto son las dos llamadas recursivas: quicksort(vector, bajo, posicion_pivote - 1) y quicksort(vector, posicion_pivote + 1, alto).">
+    <div class="seccion">Del algoritmo al código</div>
+    <h2>Función <span class="mono-t">quicksort</span></h2>
+    <div class="cod-grid">
+      <ol class="pasos-cod">
+        <li data-lineas="1"><span class="letra">1</span><div><b>Condición de corte</b><small>0 o 1 elemento: no se hace nada</small></div></li>
+        <li data-lineas="2"><span class="letra">2</span><div><b>Particionar</b><small>devuelve la posición final del pivote</small></div></li>
+        <li data-lineas="4,5"><span class="letra">3</span><div><b>Repetir en cada mitad</b><small>las dos llamadas recursivas</small></div></li>
+      </ol>
+      <pre class="codigo" data-codigo="quicksort"></pre>
+    </div>
+  </section>
+
+  <!-- ============================================ JUAN MARTÍN · MOSTRAR -->
+  <section class="diapo" data-presentador="Juan Martín Villagra Vay" data-nota="Además, agregamos la función mostrar, que no es parte del algoritmo en sí, sino que la usamos para poder visualizar en pantalla cómo va cambiando el vector en cada intercambio y cada vez que se ubica un pivote, marcando entre corchetes los límites del rango que se está ordenando.">
+    <div class="seccion">Del algoritmo al código</div>
+    <h2>Función <span class="mono-t">mostrar</span></h2>
+    <div class="cod-grid">
+      <div class="texto">
+        <p class="lede"><b>No es parte del algoritmo:</b> la agregamos para ver en pantalla cómo cambia el vector.</p>
+        <ul class="lista">
+          <li>Se usa en cada <b>intercambio</b> y cada vez que se <b>ubica un pivote</b>.</li>
+          <li>Marca entre <b>[ ]</b> los límites del rango que se está ordenando.</li>
+        </ul>
+        <div class="ejemplo-salida">
+          <small>Por ejemplo, con bajo = 1 y alto = 3:</small>
+          <code>Intercambio: 2 <b>[3]</b> 7 <b>[4]</b> 8 9</code>
+        </div>
+      </div>
+      <pre class="codigo" data-codigo="mostrar"></pre>
+    </div>
+  </section>
+
+  <!-- ============================================ MATEO · SEPARADOR -->
+  <section class="diapo apertura" data-presentador="Mateo Iturrieta" data-nota="Hola, soy Mateo Iturrieta. Voy a contar las ventajas y desventajas de Quicksort, su complejidad y las pruebas que hicimos.">
+    <div class="kicker">Parte 5 · Ventajas, complejidad y pruebas</div>
+    <h1>Mateo Iturrieta</h1>
+    <p class="sub">Qué tan bueno es Quicksort y qué mostraron nuestras pruebas.</p>
+    <ul class="agenda">
+      <li><span>1</span>Ventajas</li>
+      <li><span>2</span>Desventajas</li>
+      <li><span>3</span>Complejidad</li>
+      <li><span>4</span>Pruebas</li>
+    </ul>
+  </section>
+
+  <!-- ============================================ MATEO · VENTAJAS -->
+  <section class="diapo" data-presentador="Mateo Iturrieta" data-nota="Quicksort es uno de los métodos de ordenamiento más rápidos en la práctica. Además, ordena sobre el mismo vector, así que no necesita memoria extra. Por eso sirve para ordenar muchos datos, como una lista de precios o un ranking.">
+    <div class="seccion">Ventajas</div>
+    <h2>Por qué se usa tanto</h2>
+    <div class="tres">
+      <div class="tarjeta ventaja">
+        <div class="ilus">
+          <svg class="velocimetro" viewBox="0 0 220 130" aria-hidden="true">
+            <path d="M20 115 A90 90 0 0 1 200 115" fill="none" stroke="#e7eaef" stroke-width="18" stroke-linecap="round"/>
+            <path d="M20 115 A90 90 0 0 1 172 50" fill="none" stroke="#2a78d6" stroke-width="18" stroke-linecap="round"/>
+            <line x1="110" y1="115" x2="168" y2="62" stroke="#0e141b" stroke-width="7" stroke-linecap="round"/>
+            <circle cx="110" cy="115" r="12" fill="#0e141b"/>
+          </svg>
+        </div>
+        <h3>Muy rápido en la práctica</h3>
+        <p>Uno de los métodos de ordenamiento más rápidos cuando los datos vienen desordenados.</p>
+      </div>
+      <div class="tarjeta ventaja">
+        <div class="ilus">
+          <div class="pila-v">
+            <div class="fila-celdas">
+              <div class="celda ok">3</div><div class="celda ok">9</div><div class="celda ok">10</div><div class="celda ok">27</div><div class="celda ok">38</div>
+            </div>
+            <small>el mismo vector</small>
+            <div class="fila-celdas tachado">
+              <div class="celda">&nbsp;</div><div class="celda">&nbsp;</div><div class="celda">&nbsp;</div><div class="celda">&nbsp;</div><div class="celda">&nbsp;</div>
+            </div>
+            <small>no necesita una copia</small>
+          </div>
+        </div>
+        <h3>No necesita memoria extra</h3>
+        <p>Ordena sobre el mismo vector, intercambiando elementos de lugar.</p>
+      </div>
+      <div class="tarjeta ventaja">
+        <div class="ilus">
+          <div class="usos">
+            <div class="uso"><span>Lista de precios</span><span>$ ↑</span></div>
+            <div class="uso"><span>Ranking</span><span>1·2·3</span></div>
+            <div class="uso"><span>Registros</span><span>A→Z</span></div>
+          </div>
+        </div>
+        <h3>Sirve para muchos datos</h3>
+        <p>Ideal para ordenar grandes volúmenes, como precios o rankings.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ MATEO · DESVENTAJAS -->
+  <section class="diapo" id="d-desventajas" data-presentador="Mateo Iturrieta" data-nota="Su punto débil es el pivote. Nosotros siempre elegimos el último elemento. Si el vector ya viene ordenado, ese pivote es siempre el más grande, y cada partición deja un lado vacío. Ahí el algoritmo se vuelve muy lento. Además, no es estable: si hay dos valores iguales, puede cambiarlos de orden.">
+    <div class="seccion">Desventajas</div>
+    <h2>El punto débil: el pivote</h2>
+    <div class="dos-arboles">
+      <div class="arbol azulado">
+        <header>
+          <span class="etq azul"><i></i>Desordenado</span>
+          <span class="niveles"><b id="niv-a">0</b> niveles</span>
+        </header>
+        <div id="arbol-a"></div>
+        <p class="nota-arbol">El pivote cae <b>cerca del medio</b>: cada partición divide el vector en dos partes parecidas.</p>
+      </div>
+      <div class="arbol naranjado">
+        <header>
+          <span class="etq naranja"><i></i>Ya ordenado</span>
+          <span class="niveles"><b id="niv-o">0</b> niveles</span>
+        </header>
+        <div id="arbol-o"></div>
+        <p class="nota-arbol">El último es <b>siempre el más grande</b>: cada partición deja un lado vacío y avanza de a un elemento.</p>
+      </div>
+    </div>
+    <div class="leyenda-c">
+      <span><i style="background:var(--fijo)"></i>pivote ya ubicado</span>
+      <span><i style="background:var(--azul)"></i><i style="background:var(--naranja);margin-left:-4px"></i>tramo que falta ordenar</span>
+      <span><i style="background:#e7eaef"></i>ya resuelto</span>
+    </div>
+    <div class="estable">
+      <div class="iguales"><span>5<sub>a</sub></span><span>5<sub>b</sub></span><span class="flecha">→</span><span>5<sub>b</sub></span><span>5<sub>a</sub></span></div>
+      <p><b>No es estable:</b> dos valores iguales pueden terminar en otro orden.</p>
+    </div>
+  </section>
+
+  <!-- ============================================ MATEO · COMPLEJIDAD -->
+  <section class="diapo" id="d-complejidad" data-presentador="Mateo Iturrieta" data-nota="Con datos desordenados, que es el caso normal, es O(n log n): si duplicamos los datos, el trabajo crece apenas un poco más del doble. Con datos ya ordenados, que es el peor caso, es O(n²): si duplicamos los datos, el trabajo se multiplica por cuatro.">
+    <div class="seccion">Complejidad</div>
+    <h2>¿Qué pasa si duplicamos los datos?</h2>
+    <div class="cuerpo">
+      <div class="tarjeta caso azul">
+        <span class="etq azul"><i></i>Desordenado · caso normal</span>
+        <div class="o">O(n log n)</div>
+        <p class="dice">El trabajo crece <b>apenas un poco más del doble</b>.</p>
+        <div class="barras">
+          <div class="barra-fila"><span class="rot">n datos</span><div class="pista"><div class="relleno" data-ancho="25">×1</div></div></div>
+          <div class="barra-fila"><span class="rot">2n datos</span><div class="pista"><div class="relleno" data-ancho="55">×2,2</div></div></div>
+        </div>
+        <p class="medido">Medido en nuestras pruebas: <b>×2,0 a ×2,4</b></p>
+      </div>
+      <div class="tarjeta caso naranja">
+        <span class="etq naranja"><i></i>Ya ordenado · peor caso</span>
+        <div class="o">O(n²)</div>
+        <p class="dice">El trabajo se <b>multiplica por cuatro</b>.</p>
+        <div class="barras">
+          <div class="barra-fila"><span class="rot">n datos</span><div class="pista"><div class="relleno" data-ancho="25">×1</div></div></div>
+          <div class="barra-fila"><span class="rot">2n datos</span><div class="pista"><div class="relleno" data-ancho="100">×4</div></div></div>
+        </div>
+        <p class="medido">Medido en nuestras pruebas: <b>×4,0 exacto</b></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ MATEO · PRUEBAS -->
+  <section class="diapo" data-presentador="Mateo Iturrieta" data-nota="Probamos vectores de 500 a 8.000 elementos, uno desordenado y uno ya ordenado de cada tamaño, y medimos las comparaciones y el tiempo. Con 8.000 elementos desordenados, hizo unas 120 mil comparaciones y tardó una centésima de segundo. Con 8.000 ya ordenados, hizo casi 32 millones de comparaciones y tardó más de 3 segundos: unas 300 veces más. Y además, la recursión fue tan profunda que Python cortaba el programa, y tuvimos que subir el límite.">
+    <div class="seccion">Pruebas</div>
+    <h2>Lo que medimos</h2>
+    <div class="cuerpo">
+      <div class="grafico">
+        <h3>Comparaciones según la cantidad de elementos</h3>
+        <p class="sub">Vectores de 500 a 8.000 elementos · uno desordenado y uno ya ordenado de cada tamaño</p>
+        <div style="position:relative" id="zona-grafico">
+          <svg id="grafico" viewBox="0 0 860 470" role="img" aria-label="Comparaciones según la cantidad de elementos, para el vector desordenado y el ya ordenado"></svg>
+          <div class="tip" id="tip"></div>
+        </div>
+      </div>
+      <div class="lateral">
+        <div class="tarjeta stat">
+          <div class="quien"><span class="etq azul"><i></i>8.000 desordenados</span></div>
+          <div class="valores">
+            <div><span class="v">119.081</span><span class="u">comparaciones</span></div>
+            <div><span class="v">0,010 s</span><span class="u">una centésima</span></div>
+          </div>
+        </div>
+        <div class="tarjeta stat">
+          <div class="quien"><span class="etq naranja"><i></i>8.000 ya ordenados</span></div>
+          <div class="valores">
+            <div><span class="v">31.996.000</span><span class="u">comparaciones</span></div>
+            <div><span class="v">3,19 s</span><span class="u">más de 3 s</span></div>
+          </div>
+        </div>
+        <div class="veces">
+          <span class="x">≈310×</span>
+          <p>más lento, con la<br>misma cantidad de datos</p>
+        </div>
+        <div class="recursion">
+          La recursión llegó a 8.000 niveles: Python cortaba con <code>RecursionError</code> y tuvimos que subir el límite.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ SANTINO · CUÁNDO CONVIENE -->
+  <section class="diapo" data-presentador="Santino Ribba" data-nota="Conviene para ordenar muchos datos desordenados que entran en memoria. No conviene si los datos ya vienen ordenados o casi ordenados, si hay que mantener el orden entre valores iguales, o si son muy pocos datos.">
+    <div class="seccion">Cierre · Cuándo conviene</div>
+    <h2>¿Lo usamos o no?</h2>
+    <div class="cuerpo">
+      <div class="columna">
+        <div class="cabeza">
+          <span class="marca-si"><svg width="32" height="32" viewBox="0 0 32 32"><path d="M6 17l7 7 13-15" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Conviene
+        </div>
+        <div class="item"><span class="n">1</span><div>Ordenar <b>muchos datos desordenados</b><small>que entren en memoria, como un catálogo de precios</small></div></div>
+      </div>
+      <div class="columna">
+        <div class="cabeza">
+          <span class="marca-no"><svg width="30" height="30" viewBox="0 0 30 30"><path d="M7 7l16 16M23 7L7 23" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/></svg></span>
+          No conviene
+        </div>
+        <div class="item"><span class="n">1</span><div>Datos <b>ya ordenados</b> o casi ordenados<small>cae al peor caso, O(n²)</small></div></div>
+        <div class="item"><span class="n">2</span><div>Hay que <b>mantener el orden</b> entre valores iguales<small>no es estable</small></div></div>
+        <div class="item"><span class="n">3</span><div>Son <b>muy pocos datos</b><small>alcanza con un método más simple</small></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ SANTINO · CONCLUSIÓN -->
+  <section class="diapo" data-presentador="Santino Ribba" data-nota="Para cerrar, respondemos la pregunta del trabajo: ¿cuándo usaríamos Quicksort? Si tenemos muchos datos desordenados que entran en memoria, lo elegimos: su costo es O(n log n) y ordena sobre el mismo vector, sin memoria extra. En nuestras pruebas, 8.000 datos desordenados se ordenaron en una centésima de segundo. Si los datos suelen venir ya ordenados, elegiríamos otro método: con el pivote al final cae en O(n²), y con esos mismos 8.000 datos tardó más de 3 segundos, unas 310 veces más. Y si no sabemos cómo vienen, usaríamos Quicksort igual, pero eligiendo el pivote al azar para evitar el peor caso. Lo que aprendimos es que la eficiencia no depende solo del algoritmo: el mismo código puede ser muy rápido o muy lento según cómo lleguen los datos.">
+    <div class="seccion">Cierre · Conclusión</div>
+    <h2 style="font-size:56px; margin-bottom:24px">Si mañana tuviéramos que ordenar datos reales…</h2>
+    <div class="decisiones">
+      <div class="decision si"><span>Muchos datos <b>desordenados</b></span><span class="flecha">→</span><span class="res"><b>Usamos Quicksort</b><small>O(n log n) y sin vector extra</small></span></div>
+      <div class="decision no"><span>Datos que suelen venir <b>ordenados</b></span><span class="flecha">→</span><span class="res"><b>Elegimos otro método</b><small>con el pivote al final cae en O(n²)</small></span></div>
+      <div class="decision duda"><span><b>No sabemos</b> cómo vienen</span><span class="flecha">→</span><span class="res"><b>Quicksort con pivote al azar</b><small>así se evita el peor caso</small></span></div>
+    </div>
+    <div class="evidencia">
+      <div class="ev azul"><small>8.000 datos desordenados</small><strong>0,01 s <em>· 119.081 comp.</em></strong></div>
+      <div class="ev naranja"><small>8.000 datos ya ordenados</small><strong>3,19 s <em>· 31.996.000 comp.</em></strong></div>
+      <div class="ev total"><small>en nuestras pruebas</small><strong>≈ 310× más lento</strong></div>
+    </div>
+    <p class="cita">El mismo código puede ser muy rápido o muy lento: depende de cómo lleguen los datos.</p>
+  </section>
+
+  <!-- ============================================ MUCHAS GRACIAS -->
+  <section class="diapo gracias-d" id="d-gracias" data-presentador="Grupo 38" data-nota="¡Muchas gracias por ver nuestro video!">
+    <canvas id="lluvia" width="1600" height="900"></canvas>
+    <div class="velo"></div>
+    <div class="gr-centro">
+      <div class="gr-prompt"><span class="pr">&gt;&gt;&gt; </span><span id="gr-tipeo"></span><span class="cursor"></span></div>
+      <h1 class="gr-titulo" id="gr-titulo">¡Muchas gracias!</h1>
+      <p class="gr-sub">por ver nuestro video</p>
+      <div class="gr-equipo"><span>Santino Ribba</span><span>Ramiro Novarino</span><span>Joaquín Manavella</span><span>Juan Martín Villagra Vay</span><span>Mateo Iturrieta</span></div>
+      <div class="gr-fin"># vector ordenado: [2, 3, 4, 7, 8, 9] · Proceso finalizado con código de salida 0</div>
+    </div>
+  </section>
+
+  <footer class="pie">
+    <span class="marca"><b>Quicksort</b> · Grupo 38</span>
+    <span class="quien-habla" id="quien-habla"></span>
+    <span class="puntos" id="puntos"></span>
+  </footer>
+</div></div>
+
+<div class="notas" id="notas" hidden><h4>Notas · diapositiva <span id="nota-n"></span></h4><p id="nota-t"></p></div>
+<div class="ayuda" id="ayuda"><kbd>←</kbd> <kbd>→</kbd> cambiar · <kbd>F</kbd> pantalla completa · <kbd>N</kbd> notas</div>
+
+<script>
+(function(){
+  var escenario = document.getElementById("escenario");
+  var diapos = Array.prototype.slice.call(document.querySelectorAll(".diapo"));
+  var puntos = document.getElementById("puntos");
+  var notas = document.getElementById("notas");
+  var actual = 0;
+  var reducido = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- escalado 16:9 ---------- */
+  function ajustar(){
+    var s = Math.min(window.innerWidth / 1600, window.innerHeight / 900);
+    if (!document.fullscreenElement) s = s * 0.96;
+    escenario.style.transform = "translate(-50%, -50%) scale(" + s + ")";
+  }
+  window.addEventListener("resize", ajustar);
+  document.addEventListener("fullscreenchange", ajustar);
+  ajustar();
+  diapos.forEach(function(){ puntos.appendChild(document.createElement("i")); });
+
+  /* =========================================================
+     Parte de Ramiro: vectores de ejemplo
+     ========================================================= */
+  function cel(valor, o){
+    o = o || {};
+    var cls = "cel";
+    if (o.piv) cls += " piv";
+    if (o.fijo) cls += " fijo";
+    if (o.lt) cls += " lt";
+    if (o.gris) cls += " gris";
+    if (o.destino) cls += " destino";
+    if (o.chica) cls += " chica";
+    var i = (o.i !== undefined) ? '<span class="i">' + o.i + '</span>' : '';
+    return '<div class="' + cls + '">' + valor + i + '</div>';
+  }
+  function pintar(id, html){ document.getElementById(id).innerHTML = html; }
+
+  var original = [8, 3, 9, 5, 1, 7, 4];
+  var trasRecorrer = [3, 1, 9, 5, 8, 7, 4];
+  var trasUbicar = [3, 1, 4, 5, 8, 7, 9];
+
+  pintar("v-rango", original.map(function(v, i){ return cel(v, {i:i}); }).join(""));
+  pintar("v-paso1", original.map(function(v, i){ return cel(v, {i:i, piv: i === 6}); }).join(""));
+  pintar("v-paso2a", original.map(function(v, i){ return cel(v, {i:i, piv: i === 6}); }).join(""));
+  pintar("v-paso2b", trasRecorrer.map(function(v, i){ return cel(v, {i:i, piv: i === 6, lt: i < 2, gris: i >= 2 && i <= 5}); }).join(""));
+  pintar("v-paso3a", trasRecorrer.map(function(v, i){ return cel(v, {i:i, piv: i === 6, destino: i === 2, lt: i < 2}); }).join(""));
+  pintar("v-paso3b", trasUbicar.map(function(v, i){ return cel(v, {i:i, fijo: i === 2}); }).join(""));
+  pintar("v-paso4",
+    '<div class="grupo"><span class="g">izquierda</span>' + [3, 1].map(function(v, i){ return cel(v, {i:i, chica:true}); }).join("") + '</div>' +
+    '<div style="padding-bottom:36px">' + cel(4, {fijo:true, i:2, chica:true}) + '</div>' +
+    '<div class="grupo"><span class="g">derecha</span>' + [5, 8, 7, 9].map(function(v, i){ return cel(v, {i:i + 3, chica:true}); }).join("") + '</div>');
+
+  /* ---------- portada: Quicksort animado ---------- */
+  function cuadros(inicio){
+    var a = inicio.slice(), lista = [], fijos = {};
+    function base(){
+      var r = new Array(a.length).fill("");
+      Object.keys(fijos).forEach(function(k){ r[k] = "fijo"; });
+      return r;
+    }
+    function foto(extra){
+      var r = base();
+      Object.keys(extra || {}).forEach(function(rol){ r[extra[rol]] = rol; });
+      lista.push({arr: a.slice(), roles: r});
+    }
+    function qs(bajo, alto){
+      if (bajo > alto) return;
+      if (bajo === alto){ fijos[bajo] = true; foto(); return; }
+      var pivote = a[alto];
+      foto({piv: alto});
+      var i = bajo - 1;
+      for (var j = bajo; j < alto; j++){
+        foto({piv: alto, scan: j});
+        if (a[j] <= pivote){
+          i++;
+          var t = a[i]; a[i] = a[j]; a[j] = t;
+          foto({piv: alto, lt: i});
+        }
+      }
+      var t2 = a[i + 1]; a[i + 1] = a[alto]; a[alto] = t2;
+      fijos[i + 1] = true;
+      foto();
+      qs(bajo, i);
+      qs(i + 2, alto);
+    }
+    qs(0, a.length - 1);
+    lista.push({arr: a.slice(), roles: new Array(a.length).fill("fijo")});
+    return lista;
+  }
+
+  var teaser = (function(){
+    var caja = document.getElementById("teaser");
+    var fotos = cuadros(original);
+    var barras = {}, k = 0, reloj = null;
+    var ANCHO = 900, ALTO = 300, n = original.length, hueco = 18;
+    var celda = ANCHO / n, anchoBarra = celda - hueco;
+    original.forEach(function(v){
+      var d = document.createElement("div");
+      d.className = "bar";
+      d.style.height = (54 + (v / 9) * (ALTO - 54)) + "px";
+      d.style.width = anchoBarra + "px";
+      d.textContent = v;
+      caja.appendChild(d);
+      barras[v] = d;
+    });
+    function mostrar(f){
+      f.arr.forEach(function(v, pos){
+        var el = barras[v];
+        el.style.transform = "translateX(" + (pos * celda + hueco / 2) + "px)";
+        el.className = "bar" + (f.roles[pos] ? " " + f.roles[pos] : "");
+      });
+    }
+    function paso(){
+      k = (k + 1) % fotos.length;
+      mostrar(fotos[k]);
+      var espera = (k === fotos.length - 1) ? 2600 : (k === 0 ? 1200 : 650);
+      reloj = setTimeout(paso, espera);
+    }
+    mostrar(fotos[0]);
+    return {
+      iniciar: function(){
+        this.detener(); k = 0; mostrar(fotos[0]);
+        if (reducido){ mostrar(fotos[fotos.length - 1]); return; }
+        reloj = setTimeout(paso, 1000);
+      },
+      detener: function(){ if (reloj){ clearTimeout(reloj); reloj = null; } }
+    };
+  })();
+
+  /* =========================================================
+     Parte de Mateo: niveles, barras y gráfico
+     ========================================================= */
+  var BALANCEADO = ["aaaaaaa", "aaapaaa", "-p-p-p-"];
+  var ORDENADO   = ["aaaaaaa", "aaaaaap", "aaaaapp", "aaaappp", "aaapppp", "aappppp", "apppppp"];
+  function armarArbol(id, filas){
+    document.getElementById(id).innerHTML = filas.map(function(f){
+      return '<div class="nivel">' + f.split("").map(function(ch){
+        return '<div class="c ' + (ch === "a" ? "act" : ch === "p" ? "piv" : "") + '"></div>';
+      }).join("") + "</div>";
+    }).join("");
+  }
+  armarArbol("arbol-a", BALANCEADO);
+  armarArbol("arbol-o", ORDENADO);
+
+  var timers = [];
+  function animarArboles(){
+    var a = document.querySelectorAll("#arbol-a .nivel");
+    var o = document.querySelectorAll("#arbol-o .nivel");
+    var na = document.getElementById("niv-a"), no = document.getElementById("niv-o");
+    [a, o].forEach(function(l){ l.forEach(function(x){ x.classList.remove("visto"); }); });
+    na.textContent = "0"; no.textContent = "0";
+    var paso = reducido ? 0 : 420;
+    for (var k = 0; k < o.length; k++){
+      (function(k){
+        timers.push(setTimeout(function(){
+          o[k].classList.add("visto"); no.textContent = k + 1;
+          if (a[k]){ a[k].classList.add("visto"); na.textContent = k + 1; }
+        }, 300 + k * paso));
+      })(k);
+    }
+  }
+  function animarBarras(encender){
+    document.querySelectorAll("#d-complejidad .relleno").forEach(function(r){
+      r.style.width = encender ? r.dataset.ancho + "%" : "0";
+    });
+  }
+  function cicloBarras(){
+    animarBarras(false);
+    timers.push(setTimeout(function(){ animarBarras(true); }, 900));
+  }
+
+  var N = [500, 1000, 2000, 4000, 8000];
+  var DES = [4834, 10699, 23902, 58368, 119081];
+  var ORD = [124750, 499500, 1999000, 7998000, 31996000];
+  function miles(x){ return String(Math.round(x)).replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+  (function dibujar(){
+    var svg = document.getElementById("grafico");
+    var W = 860, H = 470, pl = 70, pr = 150, pt = 20, pb = 60;
+    var aw = W - pl - pr, ah = H - pt - pb;
+    var X = function(n){ return pl + (n / 8000) * aw; };
+    var Y = function(v){ return pt + ah - (v / 35e6) * ah; };
+    var fuenteMono = 'font-family="Atkinson Hyperlegible Mono, monospace"';
+    var fuente = 'font-family="Atkinson Hyperlegible Next, sans-serif"';
+    var s = "";
+    [0, 5e6, 10e6, 15e6, 20e6, 25e6, 30e6, 35e6].forEach(function(t){
+      s += '<line x1="' + pl + '" x2="' + (W - pr) + '" y1="' + Y(t) + '" y2="' + Y(t) + '" stroke="#e3e7ec" stroke-width="1.5"/>';
+      s += '<text x="' + (pl - 14) + '" y="' + (Y(t) + 8) + '" text-anchor="end" font-size="22" fill="#7a8490" ' + fuenteMono + '>' + (t / 1e6) + (t ? " M" : "") + '</text>';
+    });
+    [2000, 4000, 6000, 8000].forEach(function(n){
+      s += '<text x="' + X(n) + '" y="' + (H - pb + 36) + '" text-anchor="middle" font-size="22" fill="#7a8490" ' + fuenteMono + '>' + miles(n) + '</text>';
+    });
+    function linea(datos, color){
+      var d = datos.map(function(v, k){ return (k ? "L" : "M") + X(N[k]).toFixed(1) + " " + Y(v).toFixed(1); }).join(" ");
+      return '<path d="' + d + '" fill="none" stroke="' + color + '" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>';
+    }
+    s += linea(DES, "#2a78d6") + linea(ORD, "#eb6834");
+    function marcas(datos, color, nombre){
+      return datos.map(function(v, k){
+        return '<circle cx="' + X(N[k]) + '" cy="' + Y(v) + '" r="9" fill="' + color + '" stroke="#f8f9fb" stroke-width="3"/>' +
+               '<circle class="pto-hit" cx="' + X(N[k]) + '" cy="' + Y(v) + '" r="26" fill="transparent" data-t="' + nombre + '" data-n="' + N[k] + '" data-v="' + v + '"/>';
+      }).join("");
+    }
+    s += marcas(DES, "#2a78d6", "Desordenado") + marcas(ORD, "#eb6834", "Ya ordenado");
+    s += '<text x="' + (X(8000) + 18) + '" y="' + (Y(ORD[4]) + 8) + '" font-size="24" font-weight="700" fill="#0e141b" ' + fuente + '>Ya ordenado</text>';
+    s += '<text x="' + (X(8000) + 18) + '" y="' + (Y(DES[4]) - 4) + '" font-size="24" font-weight="700" fill="#0e141b" ' + fuente + '>Desordenado</text>';
+    s += '<text x="' + (pl + aw / 2) + '" y="' + (H - 4) + '" text-anchor="middle" font-size="22" fill="#46505c" ' + fuente + '>Cantidad de elementos</text>';
+    svg.innerHTML = s;
+
+    var tip = document.getElementById("tip");
+    var zona = document.getElementById("zona-grafico");
+    svg.addEventListener("mousemove", function(e){
+      var t = e.target;
+      if (!t.dataset || !t.dataset.t){ tip.style.opacity = 0; return; }
+      tip.innerHTML = t.dataset.t + " · " + miles(t.dataset.n) + " elementos<br><b>" + miles(t.dataset.v) + "</b> comparaciones";
+      var r = zona.getBoundingClientRect();
+      var esc = r.width / zona.offsetWidth;
+      tip.style.left = ((e.clientX - r.left) / esc + 16) + "px";
+      tip.style.top = ((e.clientY - r.top) / esc - 70) + "px";
+      tip.style.opacity = 1;
+    });
+    svg.addEventListener("mouseleave", function(){ tip.style.opacity = 0; });
+  })();
+
+
+  /* =========================================================
+     Parte 3 (Joaquin): mazo y ejemplo con datos, sincronizados
+     ========================================================= */
+  var VEC_PASOS = [
+    {v:[8,3,7,4,9,2], b:0, a:5, piv:-1, lt:[], may:[], fijos:[], ll:0, t:"Se llama a <code>quicksort(vector, 0, 5)</code>."},
+    {v:[8,3,7,4,9,2], b:0, a:5, piv:5, lt:[], may:[], fijos:[], ll:0, t:"El pivote es el último elemento: <b>2</b>."},
+    {v:[8,3,7,4,9,2], b:0, a:5, piv:5, lt:[], may:[0,1,2,3,4], fijos:[], ll:0, t:"Ninguno es menor o igual a 2: <b>no hay intercambios</b>."},
+    {v:[2,3,7,4,9,8], b:0, a:5, piv:-1, lt:[], may:[], fijos:[0], ll:0, t:"El 2 va a la <b>posición 0</b>: ya está en su lugar final."},
+    {v:[2,3,7,4,9,8], b:1, a:5, piv:5, lt:[], may:[], fijos:[0], ll:1, t:"<code>quicksort(vector, 1, 5)</code>: el pivote es <b>8</b>."},
+    {v:[2,3,7,4,9,8], b:1, a:5, piv:5, lt:[1,2,3], may:[4], fijos:[0], ll:1, t:"3, 7 y 4 son menores: <b>ya están a la izquierda</b>. El 9 es mayor."},
+    {v:[2,3,7,4,8,9], b:1, a:5, piv:-1, lt:[], may:[], fijos:[0,4], ll:1, t:"El 8 va a la <b>posición 4</b>."},
+    {v:[2,3,7,4,8,9], b:1, a:3, piv:3, lt:[], may:[], fijos:[0,4], ll:2, t:"<code>quicksort(vector, 1, 3)</code>: el pivote es <b>4</b>."},
+    {v:[2,3,7,4,8,9], b:1, a:3, piv:3, lt:[1], may:[2], fijos:[0,4], ll:2, t:"El 3 es menor que 4; el 7 es mayor."},
+    {v:[2,3,4,7,8,9], b:1, a:3, piv:-1, lt:[], may:[], fijos:[0,2,4], ll:2, t:"El 4 va a la <b>posición 2</b>."},
+    {v:[2,3,4,7,8,9], b:-1, a:-1, piv:-1, lt:[], may:[], fijos:[0,1,2,3,4,5], ll:3, t:"Quedan tramos de un solo elemento: <b>vector ordenado</b>."}
+  ];
+  // paso del mazo que corresponde a cada cuadro: 1 elegir, 2 separar, 3 ubicar, 4 repetir
+  var ETAPA = [1, 1, 2, 3, 1, 2, 3, 1, 2, 3, 4];
+  var etapas = document.querySelectorAll("#d-datos .etapa");
+  var vgCaja = document.getElementById("vg");
+  vgCaja.innerHTML = [0,1,2,3,4,5].map(function(i){ return '<div class="vg"><span class="val"></span><span class="ix">' + i + '</span></div>'; }).join("");
+  function mostrarPaso(p, e){
+    etapas.forEach(function(x){ x.classList.toggle("on", Number(x.dataset.e) === e); });
+    var celdas = vgCaja.children;
+    for (var i = 0; i < 6; i++){
+      var c = celdas[i], cls = "vg";
+      if (p.fijos.indexOf(i) >= 0) cls += " fijo";
+      else if (i === p.piv) cls += " piv";
+      else if (p.lt.indexOf(i) >= 0) cls += " lt";
+      else if (p.may.indexOf(i) >= 0) cls += " may";
+      if (p.b >= 0 && (i < p.b || i > p.a) && p.fijos.indexOf(i) < 0) cls += " fuera";
+      c.className = cls;
+      c.firstChild.textContent = p.v[i];
+    }
+    var rg = document.getElementById("rg");
+    if (p.b >= 0){
+      rg.style.opacity = 1;
+      rg.style.left = (32 + p.b * 118) + "px";
+      rg.style.width = ((p.a - p.b) * 118 + 104) + "px";
+      document.getElementById("rg-t").textContent = "bajo = " + p.b + " · alto = " + p.a;
+    } else rg.style.opacity = 0;
+    document.getElementById("relato").innerHTML = p.t;
+    document.querySelectorAll("#llamadas li").forEach(function(li, k){
+      li.classList.toggle("on", k === p.ll);
+      li.classList.toggle("hecho", k < p.ll);
+    });
+  }
+  function animarDatos(){
+    var ultimo = VEC_PASOS.length - 1;
+    if (reducido){ mostrarPaso(VEC_PASOS[ultimo], ETAPA[ultimo]); return; }
+    var k = 0;
+    mostrarPaso(VEC_PASOS[0], ETAPA[0]);
+    function sig(){
+      k = (k + 1) % VEC_PASOS.length;
+      mostrarPaso(VEC_PASOS[k], ETAPA[k]);
+      timers.push(setTimeout(sig, k === VEC_PASOS.length - 1 ? 4500 : 2800));
+    }
+    timers.push(setTimeout(sig, 2800));
+  }
+
+  /* =========================================================
+     Parte 4 (Juan Martin): codigo con lineas resaltadas
+     ========================================================= */
+  var CODIGOS = {
+    particionar: [
+      "def particionar(vector, bajo, alto):",
+      "    pivote = vector[alto]  # el pivote es el ultimo elemento",
+      "    i = bajo - 1",
+      "    for j in range(bajo, alto):",
+      "        if vector[j] <= pivote:",
+      "            i = i + 1",
+      "            temp = vector[i]",
+      "            vector[i] = vector[j]",
+      "            vector[j] = temp",
+      "    # el pivote va a su posicion final",
+      "    temp = vector[i + 1]",
+      "    vector[i + 1] = vector[alto]",
+      "    vector[alto] = temp",
+      "    return i + 1"
+    ],
+    quicksort: [
+      "def quicksort(vector, bajo, alto):",
+      "    if bajo < alto:",
+      "        posicion_pivote = particionar(vector, bajo, alto)",
+      "        # se ordenan las dos mitades",
+      "        quicksort(vector, bajo, posicion_pivote - 1)",
+      "        quicksort(vector, posicion_pivote + 1, alto)"
+    ],
+    mostrar: [
+      "# muestra el vector marcando entre [ ] los extremos del tramo",
+      "def mostrar(vector, inicio, fin, mensaje):",
+      "    texto = \"\"",
+      "    for i in range(len(vector)):",
+      "        if i == inicio or i == fin:",
+      "            texto = texto + \"[\" + str(vector[i]) + \"] \"",
+      "        else:",
+      "            texto = texto + str(vector[i]) + \" \"",
+      "    print(mensaje + \": \" + texto)"
+    ]
+  };
+  function escapar(s){ return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function colorear(linea){
+    var corte = -1, dentro = false;
+    for (var q = 0; q < linea.length; q++){
+      if (linea[q] === '"') dentro = !dentro;
+      if (linea[q] === "#" && !dentro){ corte = q; break; }
+    }
+    var cod = corte >= 0 ? linea.slice(0, corte) : linea;
+    var com = corte >= 0 ? linea.slice(corte) : "";
+    var html = escapar(cod).replace(/("[^"]*")|\b(def|for|in|if|else|return|or)\b|\b(range|len|str|print)\b|\b(\d+)\b/g,
+      function(m, st, kw, fn, nm){
+        if (st) return '<span class="st">' + st + '</span>';
+        if (kw) return '<span class="kw">' + kw + '</span>';
+        if (fn) return '<span class="fn">' + fn + '</span>';
+        return '<span class="nm">' + nm + '</span>';
+      });
+    if (com) html += '<span class="cm">' + escapar(com) + '</span>';
+    return html;
+  }
+  document.querySelectorAll("pre.codigo").forEach(function(pre){
+    var lineas = CODIGOS[pre.dataset.codigo];
+    pre.innerHTML = lineas.map(function(l, k){
+      return '<div class="ln" data-k="' + k + '"><span class="nro">' + (k + 1) + '</span><span>' + colorear(l) + '</span></div>';
+    }).join("");
+  });
+  function animarCodigo(diapo){
+    var pasos = diapo.querySelectorAll(".pasos-cod li");
+    var lineas = diapo.querySelectorAll("pre.codigo .ln");
+    var k = -1;
+    function marcar(){
+      k = (k + 1) % pasos.length;
+      var activas = pasos[k].dataset.lineas.split(",").map(Number);
+      pasos.forEach(function(p, i){ p.classList.toggle("on", i === k); });
+      lineas.forEach(function(l){ l.classList.toggle("on", activas.indexOf(Number(l.dataset.k)) >= 0); });
+    }
+    marcar();
+    if (!reducido) bucle = setInterval(marcar, 3400);
+  }
+
+  /* =========================================================
+     Muchas gracias: lluvia de numeros y texto tipeado
+     ========================================================= */
+  var gracias = (function(){
+    var lienzo = document.getElementById("lluvia");
+    var ctx = lienzo.getContext("2d");
+    var W = 1600, H = 900, ANCHO_COL = 30, ALTO_FILA = 30;
+    var SIMBOLOS = "0123456789012345678901234567890123456789[]<=+-".split("");
+    var COLORES = ["#2a78d6", "#1baf7a", "#9aa6b3", "#9aa6b3", "#9aa6b3"];
+    var cols = [], cuadro = null, tipeo = null;
+    var TEXTO = 'print("¡Muchas gracias!")';
+    for (var c = 0; c < W / ANCHO_COL; c++) cols.push({y: Math.random() * -30, v: 0.4 + Math.random() * 0.7, color: COLORES[c % COLORES.length]});
+    function fondo(){ ctx.fillStyle = "#f8f9fb"; ctx.fillRect(0, 0, W, H); }
+    function dibujar(){
+      ctx.fillStyle = "rgba(248,249,251,0.16)";
+      ctx.fillRect(0, 0, W, H);
+      ctx.font = '700 22px "Atkinson Hyperlegible Mono", monospace';
+      ctx.textAlign = "center";
+      cols.forEach(function(col, k){
+        var y = Math.floor(col.y) * ALTO_FILA;
+        ctx.fillStyle = col.color;
+        ctx.globalAlpha = 0.75;
+        ctx.fillText(SIMBOLOS[Math.floor(Math.random() * SIMBOLOS.length)], k * ANCHO_COL + ANCHO_COL / 2, y);
+        ctx.globalAlpha = 1;
+        col.y += col.v;
+        if (y > H && Math.random() > 0.96){ col.y = 0; col.v = 0.4 + Math.random() * 0.7; }
+      });
+    }
+    function pintarTipeo(n){
+      // print( ... ) con la palabra y el texto coloreados por separado
+      var t = TEXTO.slice(0, n);
+      var h = '<span class="kw">' + t.slice(0, 5) + '</span>' + t.slice(5, 6);
+      if (n > 6) h += '<span class="st">' + t.slice(6, 24) + '</span>' + t.slice(24);
+      document.getElementById("gr-tipeo").innerHTML = h;
+    }
+    return {
+      iniciar: function(){
+        this.detener();
+        var titulo = document.getElementById("gr-titulo");
+        titulo.classList.remove("visto");
+        fondo();
+        if (reducido){
+          for (var p = 0; p < 60; p++) dibujar();
+          pintarTipeo(TEXTO.length); titulo.classList.add("visto"); return;
+        }
+        cuadro = setInterval(dibujar, 70);
+        var n = 0;
+        pintarTipeo(0);
+        tipeo = setInterval(function(){
+          n++; pintarTipeo(n);
+          if (n >= TEXTO.length){
+            clearInterval(tipeo); tipeo = null;
+            timers.push(setTimeout(function(){ titulo.classList.add("visto"); }, 350));
+          }
+        }, 85);
+      },
+      detener: function(){
+        if (cuadro){ clearInterval(cuadro); cuadro = null; }
+        if (tipeo){ clearInterval(tipeo); tipeo = null; }
+      }
+    };
+  })();
+
+  /* ---------- animaciones que se repiten ---------- */
+  var bucle = null;
+  function detenerTodo(){
+    if (bucle){ clearInterval(bucle); bucle = null; }
+    timers.forEach(clearTimeout); timers = [];
+    teaser.detener();
+    gracias.detener();
+  }
+  function iniciarAnimacion(){
+    detenerTodo();
+    animarBarras(false);
+    var id = diapos[actual].id;
+    if (id === "d-portada"){
+      teaser.iniciar();
+    } else if (id === "d-desventajas"){
+      animarArboles();
+      if (!reducido) bucle = setInterval(animarArboles, 7000);
+    } else if (id === "d-gracias"){
+      gracias.iniciar();
+    } else if (id === "d-datos"){
+      animarDatos();
+    } else if (diapos[actual].classList.contains("cod-diapo")){
+      animarCodigo(diapos[actual]);
+    } else if (id === "d-complejidad"){
+      if (reducido) animarBarras(true);
+      else { cicloBarras(); bucle = setInterval(cicloBarras, 6500); }
+    }
+  }
+
+  /* ---------- navegación ---------- */
+  function ir(k){
+    k = Math.max(0, Math.min(diapos.length - 1, k));
+    diapos[actual].classList.remove("activa");
+    actual = k;
+    diapos[actual].classList.add("activa");
+    Array.prototype.forEach.call(puntos.children, function(p, i){ p.classList.toggle("on", i <= actual); });
+    document.getElementById("quien-habla").textContent = diapos[actual].dataset.presentador || "";
+    document.getElementById("nota-n").textContent = (actual + 1) + " de " + diapos.length;
+    document.getElementById("nota-t").textContent = diapos[actual].dataset.nota || "";
+    if (history.replaceState) history.replaceState(null, "", "#" + (actual + 1));
+    iniciarAnimacion();
+  }
+
+  document.addEventListener("keydown", function(e){
+    var k = e.key;
+    if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].indexOf(k) >= 0){ e.preventDefault(); ir(actual + 1); }
+    else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].indexOf(k) >= 0){ e.preventDefault(); ir(actual - 1); }
+    else if (k === "Home"){ ir(0); }
+    else if (k === "End"){ ir(diapos.length - 1); }
+    else if (k === "f" || k === "F"){
+      if (document.fullscreenElement) document.exitFullscreen();
+      else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+    }
+    else if (k === "n" || k === "N"){ notas.hidden = !notas.hidden; }
+    else if (k === "r" || k === "R"){ iniciarAnimacion(); }
+  });
+
+  document.querySelector(".marco").addEventListener("click", function(e){
+    if (e.target.closest(".pto-hit")) return;
+    if (e.clientX < window.innerWidth / 3) ir(actual - 1); else ir(actual + 1);
+  });
+
+  setTimeout(function(){ document.getElementById("ayuda").classList.add("oculta"); }, 6000);
+
+  var inicio = parseInt((location.hash || "").replace("#", ""), 10);
+  diapos[0].classList.add("activa");
+  ir(isNaN(inicio) ? 0 : inicio - 1);
+})();
+</script>

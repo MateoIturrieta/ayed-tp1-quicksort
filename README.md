@@ -9,6 +9,13 @@ Método: **Quicksort** con el pivote en el último elemento.
 | `quicksort.py` | El método Quicksort. |
 | `paso_a_paso.py` | Pide los valores por teclado y muestra cada paso del ordenamiento. |
 | `pruebas.py` | Ordena vectores de 500 a 8.000 elementos y muestra cuántas comparaciones hace y cuánto tarda. |
+| `presentacion.html` | La presentación del video, con las animaciones. |
+
+### Ver la presentación
+
+**https://mateoiturrieta.github.io/ayed-tp1-quicksort/presentacion.html**
+
+Se abre en el navegador, sin descargar nada. Se avanza con las flechas del teclado o con un clic, y la tecla **F** pone pantalla completa.
 
 ---
 
