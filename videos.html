@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video Quicksort Grupo 38</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600;700&family=Atkinson+Hyperlegible+Next:wght@400;600;700;800&display=swap">
+<style>
+:root{
+  --fondo:#eef1f5; --tarjeta:#ffffff; --tinta:#0e141b; --tinta-2:#46505c; --tinta-3:#7a8490; --linea:#d9dee5;
+  --sans:"Atkinson Hyperlegible Next","Segoe UI",system-ui,sans-serif;
+  --mono:"Atkinson Hyperlegible Mono",ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--fondo); color:var(--tinta); font-family:var(--sans); -webkit-font-smoothing:antialiased}
+main{max-width:1040px; margin:0 auto; padding:48px 16px 64px}
+.seccion{font-family:var(--mono); font-size:14px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--tinta-3); margin:0 0 10px}
+h1{font-size:clamp(34px, 6vw, 56px); font-weight:800; letter-spacing:-.02em; line-height:1.05; margin:0 0 12px}
+.sub{font-size:19px; color:var(--tinta-2); margin:0 0 36px; line-height:1.45}
+.video{background:var(--tarjeta); border:1.5px solid var(--linea); border-radius:18px; padding:16px; margin-bottom:28px}
+.video h2{font-size:22px; margin:4px 4px 12px; display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap}
+.video h2 small{font-family:var(--mono); font-size:14px; font-weight:400; color:var(--tinta-3)}
+video{display:block; width:100%; border-radius:10px; background:#000}
+.integrantes{display:flex; flex-wrap:wrap; gap:8px; margin:0 0 36px; padding:0; list-style:none}
+.integrantes li{font-size:15px; font-weight:700; padding:6px 14px; border-radius:999px; background:var(--tarjeta); border:1.5px solid var(--linea)}
+.links{display:flex; flex-wrap:wrap; gap:12px}
+.links a{font-weight:700; color:var(--tinta); text-decoration:none; padding:10px 18px; border-radius:12px; background:var(--tarjeta); border:1.5px solid var(--linea)}
+.links a:hover{border-color:var(--tinta)}
+</style>
+</head>
+<body>
+<main>
+  <p class="seccion">Algoritmo y Estructura de Datos · Comisión 2 · Grupo 38</p>
+  <h1>Quicksort: el video</h1>
+  <p class="sub">Trabajo práctico sobre el método de ordenamiento Quicksort con el pivote en el último elemento.</p>
+  <ul class="integrantes">
+    <li>Santino Ribba</li><li>Ramiro Novarino</li><li>Joaquín Manavella</li><li>Juan Martín Villagra Vay</li><li>Mateo Iturrieta</li>
+  </ul>
+
+  <section class="video">
+    <h2>Video del trabajo <small>11:04</small></h2>
+    <video controls preload="metadata" src="videos/presentacion.mp4"></video>
+  </section>
+
+  <section class="video">
+    <h2>Escena poscréditos <small>0:33</small></h2>
+    <video controls preload="metadata" src="videos/escena-poscreditos.mp4"></video>
+  </section>
+
+  <div class="links">
+    <a href="presentacion.html">Ver la presentación</a>
+    <a href="https://github.com/MateoIturrieta/ayed-tp1-quicksort">Ver el código</a>
+  </div>
+</main>
+</body>
+</html>
